@@ -5,8 +5,9 @@ public class HumanUnit : MonoBehaviour
 {
     [Header("원본 데이터")]
     public UnitInfo unitInfo;
-
+    public BuildingData buildingData;
     public HumanPool humanPool;
+
     [Header("현재 상태")]
     [SerializeField] private int age;
     [SerializeField] private Gender gender;
@@ -80,8 +81,13 @@ public class HumanUnit : MonoBehaviour
                 naturalDeathChance += unitInfo.naturalDeathIncreasePerTurn * (age - unitInfo.adultStartAge);
                 break;
             case AgeGroup.Old:
-                naturalDeathChance += unitInfo.naturalDeathIncreasePerTurn * 10; //
+                naturalDeathChance += unitInfo.naturalDeathIncreasePerTurn * 10; 
                 break;
         }
+    }
+
+    public void GoToFarm() //농사 지으러 가자
+    {
+
     }
 }
