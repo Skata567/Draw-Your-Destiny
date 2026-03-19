@@ -1,0 +1,83 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &1
+MonoBehaviour:
+  m_ObjectHideFlags: 53
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: -1067529776, guid: 48ad49c13f957c44aaad56346e7d21b8, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  soundGeneration:
+    promptText: 
+    generationCount: 1
+    suggestionModeIndex: 1
+    generatedEntries: []
+    promptBoosterPrompts: []
+    imagePrompterPrompts: []
+    lastActiveEntryId: 
+    imageSourceIndex: 0
+    selectedCameraIndex: 0
+    imageContext:
+      kind: 3
+      assetGuid: 
+      assetPath: 
+      externalFilePath: 
+      descriptor: 
+      cacheRelativePath: SoundGeneration/ImageContext/b519b23b8cf0468faa7edaea21fb13f3.png
+  musicGeneration:
+    promptText: 
+    generatedEntries: []
+    lastActiveEntryId: 
+    imageSourceIndex: 0
+    selectedCameraIndex: 0
+    scrollPosition: 0
+    imageContext:
+      kind: 0
+      assetGuid: 
+      assetPath: 
+      externalFilePath: 
+      descriptor: 
+      cacheRelativePath: 
+    pendingTasks: []
+  autoLoop:
+    inputClipGuid: 
+    inputClipPath: 
+    segmentStart: 0
+    segmentEnd: 0
+    loopResult:
+      id: 3904b8990deb4b7eb78c9df0562a0630
+      displayName: 
+      cacheRelativePath: 
+      isSavedToProject: 0
+      fromSuggestion: 0
+      suggestionIndex: 0
+      createdTicks: 639094773162701978
+  autoVariation:
+    lastStrength: 1
+    lastSampleCount: 3
+    inputClipGuid: 
+    inputClipPath: 
+    segmentStart: 0
+    segmentEnd: 0
+    variationEntries: []
+  monsterVoice:
+    lastConversionRatio: 1
+    sourceClipGuid: 
+    sourceClipPath: 
+    segmentStart: 0
+    segmentEnd: 0
+    targetClipGuid: 
+    targetClipPath: 
+    resultEntry:
+      id: 9ef9921010804428b81f7aa78f511e5c
+      displayName: 
+      cacheRelativePath: 
+      isSavedToProject: 0
+      fromSuggestion: 0
+      suggestionIndex: 0
+      createdTicks: 639094773163878462
