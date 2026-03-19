@@ -45,6 +45,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   unitInfo: {fileID: 11400000, guid: b0d7ac82f149ade429837a8f19faa55a, type: 2}
+  buildingData: {fileID: 11400000, guid: 268a0889472ac9e46bbdc31d1b0f25cf, type: 2}
+  humanPool: {fileID: 0}
   age: 0
   gender: 0
   ageGroup: 0

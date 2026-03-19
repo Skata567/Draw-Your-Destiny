@@ -564,7 +564,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 60940318082f2194ea2589e62e57019c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  testBuilding: {fileID: 11400000, guid: 5d99c4a3e2e5b5849b5cad5988e0d8eb, type: 2}
+  testBuilding: {fileID: 11400000, guid: 268a0889472ac9e46bbdc31d1b0f25cf, type: 2}
   testModeKey: 116
   cancelKey: 27
 --- !u!1 &594323322

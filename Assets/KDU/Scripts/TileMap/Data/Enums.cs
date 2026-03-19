@@ -1,4 +1,4 @@
-// 타일 지형 타입
+﻿// 타일 지형 타입
 public enum TileType
 {
     Plain,      // 평지 (건설 가능)
@@ -9,7 +9,7 @@ public enum TileType
 }
 
 // 건물 타입
-public enum BuildingType
+public enum     BuildingType
 {
     None,       // 빈 타일
     House,      // 민가 (인구 한도 증가)

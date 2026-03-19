@@ -165,7 +165,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   humanPrefab: {fileID: 5877644716001515087, guid: d785018811b6aae49a0f00d14ee68c27,
     type: 3}
-  poolSize: 100
+  poolSize: 20
 --- !u!1 &688555335
 GameObject:
   m_ObjectHideFlags: 0

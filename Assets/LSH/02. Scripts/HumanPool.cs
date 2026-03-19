@@ -1,10 +1,10 @@
-using System.Collections.Generic;
+ï»¿using System.Collections.Generic;
 using UnityEngine;
 
 public class HumanPool : MonoBehaviour
 {
     public GameObject humanPrefab;
-    public int poolSize = 100;
+    public int poolSize = 20;
 
     private Queue<GameObject> pool = new Queue<GameObject>();
 
@@ -19,17 +19,17 @@ public class HumanPool : MonoBehaviour
         }
     }
 
-    public GameObject GetHuman() //ÀÌ°Å ¾²¼À ¼ÒÈ¯ÇÒ¶§.(Ä«µå ¸¸µå´Â »ç¶÷Àº ÀÌ°É ÀĞµµ·Ï)
+    public GameObject GetHuman() //ì´ê±° ì“°ì…ˆ ì†Œí™˜í• ë•Œ.(ì¹´ë“œ ë§Œë“œëŠ” ì‚¬ëŒì€ ì´ê±¸ ì½ë„ë¡)
     {
         if (pool.Count == 0)
         {
-            Debug.Log("ÀüºÎ ¼ÒÈ¯µÆÀ½¿ä");
+            Debug.Log("ì „ë¶€ ì†Œí™˜ëìŒìš”");
             return null;
         }
 
         GameObject human = pool.Dequeue();
         human.SetActive(true);
-
+        
         return human;
     }
 

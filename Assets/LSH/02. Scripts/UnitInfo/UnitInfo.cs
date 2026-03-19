@@ -1,4 +1,4 @@
-using UnityEngine;
+﻿using UnityEngine;
 public enum Gender
 {
     Male,
@@ -18,5 +18,5 @@ public class UnitInfo : ScriptableObject
     public int maxHealth = 1;
     public int attackPower = 1;
     public float startNaturalDeathChance = 0f;
-    public float naturalDeathIncreasePerTurn = 0.02f;
+    public float naturalDeathIncreasePerTurn = 0.01f;
 }
