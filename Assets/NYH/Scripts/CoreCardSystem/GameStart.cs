@@ -13,9 +13,10 @@ public class GameStarter : MonoBehaviour
 
         if (CardSystem.Instance != null && myDeck != null && myDeck.Count > 0)
         {
-            CardSystem.Instance.Setup(myDeck);
-            yield return new WaitForSeconds(0.1f);
-            ActionSystem.Instance.Perform(new DrawCardsGA(5));
+           
+                CardSystem.Instance.Setup(myDeck);
+                yield return new WaitForSeconds(0.1f);
+                ActionSystem.Instance.Perform(new DrawCardsGA(5));
         }
         else
         {
@@ -28,6 +29,12 @@ public class GameStarter : MonoBehaviour
         if (Input.GetKeyDown(KeyCode.D))
         {
             ActionSystem.Instance.Perform(new DrawCardsGA(1));
+        }
+
+        if (Input.GetKeyDown(KeyCode.F))
+        {
+            ActionSystem.Instance.Perform(new DiscardAllCardsGA());
+
         }
     }
 }

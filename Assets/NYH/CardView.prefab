@@ -64,6 +64,8 @@ MonoBehaviour:
     serializedVersion: 2
     m_Bits: 1048576
   dragSpeed: 0.075
+  tiltStrength: 10
+  maxTiltAngle: 20
 --- !u!65 &8816366313577697374
 BoxCollider:
   m_ObjectHideFlags: 0

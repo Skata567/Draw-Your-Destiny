@@ -14,6 +14,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   description: "\uC804\uD22C\uC758 \uD568\uC131:\uB300\uACA9\uBCC0 1\uAC1C\uB97C
     \uC120\uD0DD\uD574\n\uC77C\uC73C\uD0B5\uB2C8\uB2E4!"
-  <Mana>k__BackingField: 3
+  <Mana>k__BackingField: 10
   <Image>k__BackingField: {fileID: 8284690431070618562, guid: 20d6cce5c7ac33b4e97f0f98a09aa347,
     type: 3}

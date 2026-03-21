@@ -1,8 +1,8 @@
 namespace NYH.CoreCardSystem
 {
     using System.Collections.Generic;
+    using SerializeReferenceEditor;
     using UnityEngine;
-    using UnityEngine.UI;
 
     [CreateAssetMenu(menuName = "Data/Card")]
     public class CardData : ScriptableObject
@@ -11,5 +11,6 @@ namespace NYH.CoreCardSystem
         public string Description => description;
         [field: SerializeField] public int Mana { get; private set; }
         [field: SerializeField] public Sprite Image { get; private set; }
+        [field: SerializeReference, SR] public List<Effect> Effects {  get; private set; }
     }
 }

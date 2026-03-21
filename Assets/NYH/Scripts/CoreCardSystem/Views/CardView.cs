@@ -5,8 +5,6 @@ namespace NYH.CoreCardSystem
     using UnityEngine.UI;
     using DG.Tweening;
     using UnityEngine.EventSystems;
-    using Unity.Hierarchy;
-    using UnityEditor.ShaderGraph.Internal;
 
     public class CardView : MonoBehaviour, IPointerDownHandler, IPointerUpHandler, IPointerEnterHandler, IPointerExitHandler
     {
@@ -23,8 +21,16 @@ namespace NYH.CoreCardSystem
         [SerializeField] private GameObject wrapper;
         [SerializeField] private LayerMask dropLayer;
         [SerializeField] private float dragSpeed = 0.15f;
+        
+        [Header("Effect Settings")]
+        [SerializeField] private float tiltStrength = 5f; // 기울기 강도 (상향)
+        [SerializeField] private float maxTiltAngle = 20f; // 최대 기울기 각도
 
         public Card Card { get; private set; }
+
+        public static bool AnyCardPickedUp = false;
+        public bool IsHoverPreview { get; set; } = false; // Hover 미리보기용인지 확인용 추가
+
         private Vector3 dragStartPosition;
         private Vector3 currentVelocity; //속도용
         private Quaternion dragStartRotation;
@@ -54,6 +60,20 @@ namespace NYH.CoreCardSystem
                 mousePos.z = -mainCamera.transform.position.z;
                 transform.position = Vector3.SmoothDamp(transform.position, mousePos, ref currentVelocity, dragSpeed);
 
+                
+                // 좌우 속도가 0.5보다 작으면 0으로 처리하여 미세 떨림 방지
+                float horizontalVelocity = Mathf.Abs(currentVelocity.x) > 1500f ? currentVelocity.x : 0f;
+
+                // 오른쪽으로 가면(-), 왼쪽으로 가면(+) 회전하도록 설정 (자연스러운 관성)
+                float targetRotZ = -horizontalVelocity * tiltStrength;
+
+                // 각도 제한 
+                targetRotZ = Mathf.Clamp(targetRotZ, -maxTiltAngle, maxTiltAngle);
+
+                // 부드럽게 회전 적용 
+                Quaternion targetRotation = Quaternion.Euler(0, 0, targetRotZ);
+                transform.rotation = Quaternion.Slerp(transform.rotation, targetRotation, Time.deltaTime * 15f);
+
                 // 우클릭 시 즉시 취소
                 if (Input.GetMouseButtonDown(1))
                 {
@@ -74,14 +94,16 @@ namespace NYH.CoreCardSystem
 
         public void OnPointerEnter(PointerEventData eventData)
         {
-            if (isPickedUp || isDragging) return;
+            if (IsHoverPreview || isPickedUp || isDragging || AnyCardPickedUp) return;
             transform.SetAsLastSibling();
-            if (CardViewHoverSystem.Instance != null) CardViewHoverSystem.Instance.Show(Card, transform.position);
+            if (CardViewHoverSystem.Instance != null)
+                CardViewHoverSystem.Instance.Show(Card, transform.position);
         }
 
         public void OnPointerExit(PointerEventData eventData)
         {
-            if (isPickedUp || isDragging) return;
+            if (this == null) return;
+            if (IsHoverPreview || isPickedUp || isDragging || AnyCardPickedUp) return;
             if (CardViewHoverSystem.Instance != null) CardViewHoverSystem.Instance.Hide();
             if (cachedHandView != null) StartCoroutine(cachedHandView.UpdateCardPositions(0.15f));
         }
@@ -99,6 +121,7 @@ namespace NYH.CoreCardSystem
 
             // 새로 드래그/클릭 시작
             isDragging = true;
+            AnyCardPickedUp = true;
             pointerDownMousePos = Input.mousePosition;
             
             dragStartPosition = transform.position;
@@ -130,6 +153,7 @@ namespace NYH.CoreCardSystem
             else
             {
                 isPickedUp = true;
+                // isPickedUp이 true이므로 AnyCardPickedUp은 true 유지
             }
         }
 
@@ -145,6 +169,7 @@ namespace NYH.CoreCardSystem
             {
                 isPickedUp = false;
                 isDragging = false;
+                AnyCardPickedUp = false;
                 ActionSystem.Instance.Perform(new PlayCardGA(Card));
             }
             else
@@ -157,6 +182,7 @@ namespace NYH.CoreCardSystem
         {
             isPickedUp = false;
             isDragging = false;
+            AnyCardPickedUp = false;
             if (cachedHandView != null) StartCoroutine(cachedHandView.AddCard(this));
             else
             {
