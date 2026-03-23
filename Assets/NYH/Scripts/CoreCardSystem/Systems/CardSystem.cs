@@ -190,8 +190,7 @@ namespace NYH.CoreCardSystem
                             break; 
                         }
                     }
-                }
-                
+                }               
                 // 순차적으로 버리지 않고 동시에 버리기 위해 코루틴 병렬 실행 고려 가능
                 // 여기서는 순차적으로 실행
                 StartCoroutine(DiscardCard(cardView)); 

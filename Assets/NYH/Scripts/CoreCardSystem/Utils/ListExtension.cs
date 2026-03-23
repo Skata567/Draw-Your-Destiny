@@ -17,7 +17,7 @@ namespace NYH.CoreCardSystem
             return t;
         }
 
-        // ✅ 덱을 섞기 위한 Shuffle 확장 메서드 추가
+        //덱을 섞기 위한 Shuffle 확장 메서드 추가
         public static void Shuffle<T>(this List<T> list)
         {
             for (int i = 0; i < list.Count; i++)

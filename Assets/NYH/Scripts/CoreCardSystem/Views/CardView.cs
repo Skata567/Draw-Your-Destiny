@@ -112,6 +112,12 @@ namespace NYH.CoreCardSystem
         {
             if (eventData.button != PointerEventData.InputButton.Left) return;
 
+            if(ActionSystem.Instance.IsPerforming)
+            {
+
+                return;
+            }
+
             // 이미 집어든 상태에서 다시 클릭한 경우
             if (isPickedUp)
             {
