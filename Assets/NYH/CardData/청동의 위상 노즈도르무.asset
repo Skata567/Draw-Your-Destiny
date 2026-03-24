@@ -16,6 +16,10 @@ MonoBehaviour:
     \uCC9C\uC0C1\uC758 \uBCF4\uD638\uB9C9\uC744 \uBD80\uC5EC\uD569\uB2C8\uB2E4. \uC774\uBBF8
     \uCC9C\uC0C1\uC758 \uBCF4\uD638\uB9C9\uC744 \uAC00\uC9C0\uACE0 \uC788\uB358 \uD558\uC218\uC778\uC740
     \uADF8 \uB300\uC2E0 +3/+3\uB97C \uC5BB\uC2B5\uB2C8\uB2E4."
-  <Mana>k__BackingField: 4
+  <Cost>k__BackingField: 5
   <Image>k__BackingField: {fileID: 8284690431070618562, guid: 20d6cce5c7ac33b4e97f0f98a09aa347,
     type: 3}
+  <Effects>k__BackingField: []
+  references:
+    version: 2
+    RefIds: []

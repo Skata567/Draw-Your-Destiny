@@ -1,28 +1,39 @@
-namespace NYH.CoreCardSystem
+﻿namespace NYH.CoreCardSystem
 {
     using System.Collections.Generic;
     using UnityEngine;
     using System.Collections;
     using DG.Tweening;
 
+    /// <summary>
+    /// 카드 게임의 규칙(드로우, 플레이, 버리기 등)과 데이터(덱, 손패, 무덤)를 관리하는 핵심 시스템입니다.
+    /// ActionSystem에서 전달받은 '동작'들을 실제로 수행(Perform)합니다.
+    /// </summary>
     public class CardSystem : Singleton<CardSystem>
     {
-        [SerializeField] private HandView handView;
-        [SerializeField] private Transform drawPilePoint;
-        [SerializeField] private Transform discardPilePoint;
+        [Header("UI & Positions")]
+        [SerializeField] private HandView handView;        // 손패를 보여주는 뷰
+        [SerializeField] private Transform drawPilePoint;    // 덱 위치
+        [SerializeField] private Transform discardPilePoint; // 무덤 위치
 
-        private List<Card> drawPile = new();
-        private List<Card> hand = new();
-        private List<Card> discardPile = new();
+        // 게임 내 카드 데이터들
+        private List<Card> drawPile = new();    // 덱
+        private List<Card> hand = new();        // 손패
+        private List<Card> discardPile = new(); // 무덤(버려진 카드)
 
         protected override void Awake()
         {
             base.Awake();
-            // 액션 연결
+            
+            // 액션 연결 (AttachPerformer)
             ActionSystem.AttachPerformer<DrawCardsGA>(action => Perform(action));
             ActionSystem.AttachPerformer<PlayCardGA>(action => Perform(action));
             ActionSystem.AttachPerformer<DiscardAllCardsGA>(action => Perform(action));
             ActionSystem.AttachPerformer<DiscardRandomGA>(action => Perform(action));
+            ActionSystem.AttachPerformer<GoldCardGA>(action => Perform(action));
+            ActionSystem.AttachPerformer<PlayCostGA>(action => Perform(action));
+            ActionSystem.AttachPerformer<ChooseOneGA>(action => Perform(action));
+            
             Debug.Log("[CardSystem] 초기화 및 액션 등록 완료");
         }
 
@@ -39,34 +50,21 @@ namespace NYH.CoreCardSystem
             Debug.Log($"[CardSystem] 덱 세팅 완료: {drawPile.Count}장");
         }
 
+        /// <summary>
+        /// ActionSystem에서 전달받은 모든 액션을 여기서 분기하여 처리합니다.
+        /// </summary>
         public IEnumerator Perform(GameAction action)
         {
             if (action is DrawCardsGA drawCardsGA)
             {
-                Debug.Log($"[CardSystem] {drawCardsGA.Amount}장 드로우 시퀀스 시작");
                 for (int i = 0; i < drawCardsGA.Amount; i++)
                 {
-                    if (drawPile.Count == 0) 
-                    {
-                        Debug.Log("[CardSystem] 덱이 비어있어 리필을 시도합니다.");
-                        RefillDeck();
-                    }
-
-                    if (hand.Count >= 10) //손패 갯수 제한
-                    {
-                        Debug.Log("손패가 가득 찼습니다!");
-                        break;
-                    }
-
+                    if (drawPile.Count == 0) RefillDeck();
+                    if (hand.Count >= 10) break;
                     if (drawPile.Count > 0) 
                     {
-                        yield return DrawCard();
-                        yield return new WaitForSeconds(0.1f); // 카드 간 간격
-                    }
-                    else
-                    {
-                        Debug.LogWarning("[CardSystem] 더 이상 뽑을 카드가 없습니다.");
-                        break;
+                        yield return DrawOneCard();
+                        yield return new WaitForSeconds(0.1f);
                     }
                 }
             }
@@ -80,122 +78,72 @@ namespace NYH.CoreCardSystem
             }
             else if (action is DiscardRandomGA discardRandomGA)
             {
-                for (int i = 0; i < discardRandomGA.Amount;i++)
+                for (int i = 0; i < discardRandomGA.Amount; i++)
                 {
                     if (hand.Count == 0) break;
-                    int randomIndex = Random.Range(0, hand.Count);
-                    Card targetCard = hand[randomIndex];
-
+                    Card targetCard = hand[Random.Range(0, hand.Count)];
                     yield return DiscardCardByInstance(targetCard);
                 }
             }
+            else if (action is GoldCardGA goldCardGA)
+            {
+                GameManager.Instance.AddGold(goldCardGA.Amount);
+                yield return null;
+            }
+            else if (action is PlayCostGA playCostGA)
+            {
+                GameManager.Instance.SpendGold(playCostGA.Amount);
+                yield return null;
+            }
+            else if (action is ChooseOneGA chooseOneGA)
+            {
+                yield return ChooseCardPerformer(chooseOneGA.Amount);
+            }
         }
 
-        private IEnumerator PlayCard(PlayCardGA playCardGA)
+        /// <summary>
+        /// [발견 로직] 덱에서 N장을 보여주고 하나를 고릅니다.
+        /// </summary>
+        private IEnumerator ChooseCardPerformer(int amount)
         {
-            // Deprecated: Use PlayCardPerformer instead
-            yield return PlayCardPerformer(playCardGA);
+            if (drawPile.Count == 0) yield break;
+
+            // 1. 보여줄 카드 리스트 만들기 (덱에서 빼지 않고 복사만 함)
+            List<Card> choices = new List<Card>();
+            int actualAmount = Mathf.Min(amount, drawPile.Count);
+            for (int i = 0; i < actualAmount; i++) choices.Add(drawPile[i]);
+
+            // 2. UI 호출 및 유저 선택 대기
+            Card selectedCard = null;
+            bool isChosen = false;
+
+            if (CardSelectionUI.Instance == null)
+            {
+                Debug.LogError("[CardSystem] CardSelectionUI가 없습니다!");
+                yield break;
+            }
+
+            CardSelectionUI.Instance.Show(choices, (card) => { selectedCard = card; isChosen = true; });
+            yield return new WaitUntil(() => isChosen);
+
+            // 3. 선택된 카드 처리
+            if (selectedCard != null)
+            {
+                drawPile.Remove(selectedCard); // 덱에서 제거
+                hand.Add(selectedCard);        // 데이터 추가
+                
+                // 화면 연출
+                CardView cardView = CardViewCreator.Instance.CreateCardView(selectedCard, Vector3.zero, Quaternion.identity);
+                yield return handView.AddCard(cardView);
+            }
         }
 
-        private IEnumerator DrawCard()
+        private IEnumerator DrawOneCard()
         {
             Card card = drawPile.Draw();
             hand.Add(card);
-            
-            Debug.Log($"[CardSystem] 카드 뽑는 중: {card.Title}");
-
-            if (CardViewCreator.Instance == null)
-            {
-                Debug.LogError("[CardSystem] CardViewCreator.Instance가 null입니다! 씬에 프리팹을 가진 오브젝트가 있는지 확인하세요.");
-                yield break;
-            }
-
-            if (drawPilePoint == null || handView == null)
-            {
-                Debug.LogError("[CardSystem] drawPilePoint나 handView가 할당되지 않았습니다!");
-                yield break;
-            }
-
             CardView cardView = CardViewCreator.Instance.CreateCardView(card, drawPilePoint.position, drawPilePoint.rotation);
-            if (cardView != null)
-            {
-                yield return handView.AddCard(cardView);
-                Debug.Log($"[CardSystem] '{card.Title}' 드로우 애니메이션 완료.");
-            }
-        }
-
-        private void RefillDeck()
-        {
-            if (discardPile.Count > 0)
-            {
-                drawPile.AddRange(discardPile);
-                discardPile.Clear();
-                drawPile.Shuffle();
-            }
-        }
-
-        private IEnumerator DiscardCard(CardView cardView)
-        {
-            if (cardView == null) yield break;
-            discardPile.Add(cardView.Card);
-            
-            cardView.transform.DOKill();
-            cardView.transform.DOScale(Vector3.zero, 0.2f);
-            Tween tween = cardView.transform.DOMove(discardPilePoint.position, 0.2f);
-            if (tween != null) yield return tween.WaitForCompletion();
-            
-            if (cardView != null) Destroy(cardView.gameObject);
-        }
-
-        private IEnumerator DiscardCardByInstance(Card targetCard)
-        {
-            if (targetCard == null) yield break;
-
-            hand.Remove(targetCard);
-            CardView cardView = handView.RemoveCard(targetCard);
-            
-            if (cardView == null)
-            {
-                CardView[] allViews = FindObjectsByType<CardView>(FindObjectsSortMode.None);
-                foreach (var cv in allViews)
-                {
-                    if (cv.Card == targetCard && !cv.IsHoverPreview) 
-                    { 
-                        cardView = cv; 
-                        break; 
-                    }
-                }
-            }
-            yield return DiscardCard(cardView);
-        }
-
-        private IEnumerator DiscardAllCardsPerformer(DiscardAllCardsGA discardAllCardsGA)
-        {
-            // 리스트를 복사해서 순회 (중간에 hand에서 제거하므로)
-            List<Card> cardsToDiscard = new List<Card>(hand);
-            hand.Clear();
-
-            foreach (var card in cardsToDiscard)
-            {
-                CardView cardView = handView.RemoveCard(card);
-                // 카드가 화면에 없다면 찾아서라도 제거
-                if (cardView == null)
-                {
-                    CardView[] allViews = FindObjectsByType<CardView>(FindObjectsSortMode.None);
-                    foreach (var cv in allViews)
-                    {
-                        if (cv.Card == card && !cv.IsHoverPreview) 
-                        { 
-                            cardView = cv; 
-                            break; 
-                        }
-                    }
-                }               
-                // 순차적으로 버리지 않고 동시에 버리기 위해 코루틴 병렬 실행 고려 가능
-                // 여기서는 순차적으로 실행
-                StartCoroutine(DiscardCard(cardView)); 
-                yield return new WaitForSeconds(0.05f); // 약간의 시차
-            }
+            if (cardView != null) yield return handView.AddCard(cardView);
         }
 
         private IEnumerator PlayCardPerformer(PlayCardGA playCardGA)
@@ -208,28 +156,66 @@ namespace NYH.CoreCardSystem
                 CardView[] allViews = FindObjectsByType<CardView>(FindObjectsSortMode.None);
                 foreach (var cv in allViews)
                 {
-                    // Hover 미리보기용이 아닌 실제 카드 뷰만 찾습니다.
-                    if (cv.Card == playCardGA.Card && !cv.IsHoverPreview) 
-                    { 
-                        cardView = cv; 
-                        break; 
-                    }
+                    if (cv.Card == playCardGA.Card && !cv.IsHoverPreview) { cardView = cv; break; }
                 }
             }
 
-            //카드 삭제
-            yield return DiscardCard(cardView);
+            yield return DiscardCardAnimation(cardView);
             
-            if (playCardGA.Card != null && playCardGA.Card.Effects != null)
+            if (playCardGA.Card?.Effects != null)
             {
                 foreach(var effect in playCardGA.Card.Effects)
                 {
-                    PerformEffectGA performEffectGA = new(effect);
-                    ActionSystem.Instance.AddReaction(performEffectGA);
+                    ActionSystem.Instance.AddReaction(new PerformEffectGA(effect));
                 }
             }
+        }
 
+        private void RefillDeck()
+        {
+            if (discardPile.Count > 0)
+            {
+                // 유니티 콘솔에서 눈에 띄게 노란색으로 표시합니다.
+                Debug.Log($"<color=yellow>[CardSystem] 덱이 비어있어 무덤의 {discardPile.Count}장을 다시 섞어 넣습니다!</color>");
 
+                drawPile.AddRange(discardPile);
+                discardPile.Clear();
+                drawPile.Shuffle();
+            }
+            else
+            {
+                Debug.LogWarning("[CardSystem] 덱과 무덤이 모두 비어있어 더 이상 뽑을 카드가 없습니다!");
+            }
+        }
+
+        private IEnumerator DiscardCardAnimation(CardView cardView)
+        {
+            if (cardView == null) yield break;
+            discardPile.Add(cardView.Card);
+            cardView.transform.DOKill();
+            cardView.transform.DOScale(Vector3.zero, 0.2f);
+            yield return cardView.transform.DOMove(discardPilePoint.position, 0.2f).WaitForCompletion();
+            Destroy(cardView.gameObject);
+        }
+
+        private IEnumerator DiscardCardByInstance(Card targetCard)
+        {
+            if (targetCard == null) yield break;
+            hand.Remove(targetCard);
+            CardView cardView = handView.RemoveCard(targetCard);
+            yield return DiscardCardAnimation(cardView);
+        }
+
+        private IEnumerator DiscardAllCardsPerformer(DiscardAllCardsGA discardAllCardsGA)
+        {
+            List<Card> cardsToDiscard = new List<Card>(hand);
+            hand.Clear();
+            foreach (var card in cardsToDiscard)
+            {
+                CardView cardView = handView.RemoveCard(card);
+                StartCoroutine(DiscardCardAnimation(cardView)); 
+                yield return new WaitForSeconds(0.05f);
+            }
         }
     }
 }

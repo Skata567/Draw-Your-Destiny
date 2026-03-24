@@ -13,11 +13,12 @@ MonoBehaviour:
   m_Name: "\uC2E0\uBE44\uD55C \uC9C0\uB2A5"
   m_EditorClassIdentifier: 
   description: "\uCE74\uB4DC\uB97C 2\uC7A5 \uBF51\uC2B5\uB2C8\uB2E4."
-  <Mana>k__BackingField: 3
+  <Cost>k__BackingField: 3
   <Image>k__BackingField: {fileID: -8667803144176668281, guid: 1c9bc0d104c01934da10d4333b9dc48b,
     type: 3}
   <Effects>k__BackingField:
   - rid: 6994848261097390332
+  - rid: 7587805055205507155
   references:
     version: 2
     RefIds:
@@ -25,3 +26,7 @@ MonoBehaviour:
       type: {class: DrawCardEffect, ns: , asm: Assembly-CSharp}
       data:
         drawAmount: 2
+    - rid: 7587805055205507155
+      type: {class: PlayCostCardEffect, ns: , asm: Assembly-CSharp}
+      data:
+        playCardCost: 3

@@ -14,6 +14,15 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   description: "\uC804\uD22C\uC758 \uD568\uC131: '\uD669\uAE08 \uC6D0\uC22D\uC774
     \uBCF4\uBB3C\uC9C0\uB3C4'\uB97C \uB0B4 \uB371\uC5D0 \uC11E\uC5B4 \uB123\uC2B5\uB2C8\uB2E4."
-  <Mana>k__BackingField: 4
+  <Cost>k__BackingField: 4
   <Image>k__BackingField: {fileID: 8284690431070618562, guid: 20d6cce5c7ac33b4e97f0f98a09aa347,
     type: 3}
+  <Effects>k__BackingField:
+  - rid: 7587805055205507157
+  references:
+    version: 2
+    RefIds:
+    - rid: 7587805055205507157
+      type: {class: PlayCostCardEffect, ns: , asm: Assembly-CSharp}
+      data:
+        playCardCost: 4

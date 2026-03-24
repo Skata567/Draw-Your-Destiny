@@ -1,4 +1,4 @@
-using NYH.CoreCardSystem;
+﻿using NYH.CoreCardSystem;
 using UnityEngine;
 
 public class DrawCardEffect : Effect
@@ -7,7 +7,7 @@ public class DrawCardEffect : Effect
 
     public override GameAction GetGameAction()
     {
-       DrawCardsGA drawCardsGA = new(drawAmount);
+        DrawCardsGA drawCardsGA = new(drawAmount);
         return drawCardsGA;
     }
 }

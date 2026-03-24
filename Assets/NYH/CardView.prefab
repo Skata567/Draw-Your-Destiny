@@ -56,16 +56,14 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   titleText: {fileID: 2703100120491470851}
   descriptionText: {fileID: 818123263642599619}
-  manaText: {fileID: 3304374390335697760}
+  costText: {fileID: 3304374390335697760}
   cardArtImage: {fileID: 5489979775067489917}
   cardBackgroundImage: {fileID: 2621432718778435513}
-  wrapper: {fileID: 6125348193698593725}
   dropLayer:
     serializedVersion: 2
     m_Bits: 1048576
-  dragSpeed: 0.075
+  dragSpeed: 0.01
   tiltStrength: 10
-  maxTiltAngle: 20
 --- !u!65 &8816366313577697374
 BoxCollider:
   m_ObjectHideFlags: 0

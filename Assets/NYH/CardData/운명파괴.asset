@@ -14,12 +14,13 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   description: "\uCE74\uB4DC\uB97C 2\uC7A5 \uBF51\uC2B5\uB2C8\uB2E4.\n\uADF8 \uD6C4
     \uCE74\uB4DC\uB97C 2\uC7A5 \uBC84\uB9BD\uB2C8\uB2E4."
-  <Mana>k__BackingField: 1
+  <Cost>k__BackingField: 2
   <Image>k__BackingField: {fileID: -8667803144176668281, guid: 1c9bc0d104c01934da10d4333b9dc48b,
     type: 3}
   <Effects>k__BackingField:
   - rid: 6994848261097390348
   - rid: 6994848261097390349
+  - rid: 7587805055205507153
   references:
     version: 2
     RefIds:
@@ -31,3 +32,7 @@ MonoBehaviour:
       type: {class: DiscardRandomEffect, ns: , asm: Assembly-CSharp}
       data:
         discardAmount: 2
+    - rid: 7587805055205507153
+      type: {class: PlayCostCardEffect, ns: , asm: Assembly-CSharp}
+      data:
+        playCardCost: 2
