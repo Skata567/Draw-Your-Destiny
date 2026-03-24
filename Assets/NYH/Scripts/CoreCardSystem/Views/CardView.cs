@@ -92,7 +92,9 @@
         public void OnPointerExit(PointerEventData eventData)
         {
             if (this == null) return;
-            if (IsHoverPreview || isPickedUp || isDragging || AnyCardPickedUp) return;
+            
+            // 드래그 중이거나 다른 카드를 집어든 상태라면 무시 (단, IsHoverPreview는 여기서 체크하지 않음)
+            if (isPickedUp || isDragging || AnyCardPickedUp) return;
 
             // [핵심] 크게 보여주던 미리보기를 숨깁니다.
             if (CardViewHoverSystem.Instance != null)
@@ -100,12 +102,19 @@
                 CardViewHoverSystem.Instance.Hide();
             }
 
-            // 손패 위치를 다시 정렬합니다.
-            if (cachedHandView != null) StartCoroutine(cachedHandView.UpdateCardPositions(0.15f));
+            // [수정] 일반 카드(손패)인 경우에만 손패 위치를 다시 정렬합니다.
+            // IsHoverPreview가 true인 카드(선택창 등)는 손패 정렬을 건드리지 않습니다.
+            if (!IsHoverPreview && cachedHandView != null)
+            {
+                StartCoroutine(cachedHandView.UpdateCardPositions(0.15f));
+            }
         }
 
         public void OnPointerDown(PointerEventData eventData)
         {
+            // [추가] 미리보기/UI용 카드인 경우 모든 클릭/드래그 상호작용을 차단합니다.
+            if (IsHoverPreview) return;
+
             if (eventData.button != PointerEventData.InputButton.Left) return;
             if (ActionSystem.Instance.IsPerforming) return;
 
@@ -124,6 +133,9 @@
 
         public void OnPointerUp(PointerEventData eventData)
         {
+            // [추가] 미리보기/UI용 카드인 경우 상호작용 차단
+            if (IsHoverPreview) return;
+
             if (eventData.button != PointerEventData.InputButton.Left || !isDragging) return;
             isDragging = false;
             if (Vector3.Distance(Input.mousePosition, pointerDownMousePos) > clickThreshold) TryPlayCard();

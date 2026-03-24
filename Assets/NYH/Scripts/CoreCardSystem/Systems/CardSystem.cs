@@ -2,6 +2,7 @@
 {
     using System.Collections.Generic;
     using UnityEngine;
+    using UnityEngine.UI;
     using System.Collections;
     using DG.Tweening;
 
@@ -15,6 +16,10 @@
         [SerializeField] private HandView handView;        // 손패를 보여주는 뷰
         [SerializeField] private Transform drawPilePoint;    // 덱 위치
         [SerializeField] private Transform discardPilePoint; // 무덤 위치
+
+        [SerializeField] private Text deackCount;           // 덱 숫자를 띄울 텍스트
+        [SerializeField] private Text discardCount;         // 무덤의 카드 숫자 띄울 텍스트
+
 
         // 게임 내 카드 데이터들
         private List<Card> drawPile = new();    // 덱
@@ -36,6 +41,7 @@
             
             Debug.Log("[CardSystem] 초기화 및 액션 등록 완료");
         }
+
 
         public void Setup(List<CardData> initialDeck)
         {
@@ -130,8 +136,9 @@
             if (selectedCard != null)
             {
                 drawPile.Remove(selectedCard); // 덱에서 제거
+                deackCount.text = $"{drawPile.Count}장";
                 hand.Add(selectedCard);        // 데이터 추가
-                
+                discardCount.text = $"{discardPile.Count}장";
                 // 화면 연출
                 CardView cardView = CardViewCreator.Instance.CreateCardView(selectedCard, Vector3.zero, Quaternion.identity);
                 yield return handView.AddCard(cardView);
@@ -142,6 +149,7 @@
         {
             Card card = drawPile.Draw();
             hand.Add(card);
+            deackCount.text = $"{drawPile.Count}장";
             CardView cardView = CardViewCreator.Instance.CreateCardView(card, drawPilePoint.position, drawPilePoint.rotation);
             if (cardView != null) yield return handView.AddCard(cardView);
         }
@@ -175,12 +183,11 @@
         {
             if (discardPile.Count > 0)
             {
-                // 유니티 콘솔에서 눈에 띄게 노란색으로 표시합니다.
                 Debug.Log($"<color=yellow>[CardSystem] 덱이 비어있어 무덤의 {discardPile.Count}장을 다시 섞어 넣습니다!</color>");
-
                 drawPile.AddRange(discardPile);
                 discardPile.Clear();
                 drawPile.Shuffle();
+                discardCount.text = $"{discardPile.Count}장";
             }
             else
             {
@@ -192,6 +199,7 @@
         {
             if (cardView == null) yield break;
             discardPile.Add(cardView.Card);
+            discardCount.text = $"{discardPile.Count}장";
             cardView.transform.DOKill();
             cardView.transform.DOScale(Vector3.zero, 0.2f);
             yield return cardView.transform.DOMove(discardPilePoint.position, 0.2f).WaitForCompletion();
@@ -202,6 +210,7 @@
         {
             if (targetCard == null) yield break;
             hand.Remove(targetCard);
+            discardCount.text = $"{discardPile.Count}장";
             CardView cardView = handView.RemoveCard(targetCard);
             yield return DiscardCardAnimation(cardView);
         }
@@ -213,9 +222,39 @@
             foreach (var card in cardsToDiscard)
             {
                 CardView cardView = handView.RemoveCard(card);
-                StartCoroutine(DiscardCardAnimation(cardView)); 
+                StartCoroutine(DiscardCardAnimation(cardView));
+                discardCount.text = $"{discardPile.Count}장";
                 yield return new WaitForSeconds(0.05f);
             }
+        }
+
+        /// <summary>
+        /// 덱에 있는 모든 카드를 무작위 순서로 보여줍니다 (단순 확인용).
+        /// </summary>
+        public void ShowDeck()
+        {
+            if (drawPile.Count == 0) return;
+            if (CardListUI.Instance == null) return;
+
+            // 덱 데이터를 복사한 뒤 무작위로 섞습니다 (실제 덱 순서에는 영향을 주지 않음)
+            List<Card> shuffledCopy = new List<Card>(drawPile);
+            shuffledCopy.Shuffle();
+
+            CardListUI.Instance.Show(shuffledCopy, "덱 확인");
+        }
+
+        /// <summary>
+        /// 무덤에 있는 모든 카드를 무작위 순서로 보여줍니다 (단순 확인용).
+        /// </summary>
+        public void ShowGraveyard()
+        {
+            if (discardPile.Count == 0) return;
+            if (CardListUI.Instance == null) return;
+
+            List<Card> shuffledCopy = new List<Card>(discardPile);
+            shuffledCopy.Shuffle();
+
+            CardListUI.Instance.Show(shuffledCopy, "무덤 확인");
         }
     }
 }

@@ -30,7 +30,7 @@ using UnityEngine;
 
 public class DiscardRandomEffect : Effect
 {
-    [Header("설정: 랜덤으로 버릴 장수")]
+    [Header("랜덤으로 버릴 장수")]
     [SerializeField] private int discardAmount; 
 
     public override GameAction GetGameAction()

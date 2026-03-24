@@ -15,6 +15,7 @@ namespace NYH.CoreCardSystem
         [Header("UI References")]
         [SerializeField] private GameObject panel;       
         [SerializeField] private Transform container;    
+        [SerializeField] private Button closeButton;     // [추가] 닫기 버튼 레퍼런스
 
         private Action<Card> onCardSelectedCallback;
 
@@ -23,14 +24,27 @@ namespace NYH.CoreCardSystem
             if (Instance != null) { Destroy(gameObject); return; }
             Instance = this;
             if (panel != null) panel.SetActive(false);
+
+            // [추가] 닫기 버튼 클릭 시 Close 함수 호출 연결
+            if (closeButton != null)
+            {
+                closeButton.onClick.AddListener(Close);
+            }
         }
 
-        public void Show(List<Card> cards, Action<Card> onSelected)
+        public void Show(List<Card> cards, Action<Card> onSelected = null)
         {
             if (panel == null || container == null) return;
 
             onCardSelectedCallback = onSelected;
             panel.SetActive(true);
+
+            // [추가] 선택 모드(onSelected가 있음)라면 닫기 버튼을 숨기고, 
+            // 단순 보기 모드(onSelected가 없음)라면 닫기 버튼을 보여줍니다.
+            if (closeButton != null)
+            {
+                closeButton.gameObject.SetActive(onSelected == null);
+            }
 
             // 1. 기존 카드 제거
             foreach (Transform child in container) Destroy(child.gameObject);
@@ -41,16 +55,27 @@ namespace NYH.CoreCardSystem
                 CardView cardView = CardViewCreator.Instance.CreateCardView(card, container.position, Quaternion.identity);
                 cardView.transform.SetParent(container, false);
 
-                // [중요] 호버 기능 복구: 이제 IsHoverPreview를 true로 하지 않습니다!
-                // cardView.IsHoverPreview = false; (기본값이 false임)
+                // [중요] 호버 기능 설정: IsHoverPreview를 true로 설정합니다.
+                cardView.IsHoverPreview = true;
 
-                // 클릭 처리를 위한 버튼 설정
+                // 클릭 처리를 위한 버튼 설정 (선택 콜백이 있을 때만 활성화)
                 Button button = cardView.GetComponent<Button>();
                 if (button == null) button = cardView.gameObject.AddComponent<Button>();
 
                 button.onClick.RemoveAllListeners();
-                Card capturedCard = card;
-                button.onClick.AddListener(() => OnCardClicked(capturedCard));
+                
+                if (onSelected != null)
+                {
+                    Card capturedCard = card;
+                    button.onClick.AddListener(() => OnCardClicked(capturedCard));
+                    button.interactable = true;
+                }
+                else
+                {
+                    // 단순 보기 모드일 때는 버튼 상호작용은 끄되, 호버는 작동하게 합니다.
+                    // (만약 버튼 자체가 Raycast를 막는다면 interatacle만 끄거나 필요시 조정)
+                    button.interactable = false;
+                }
 
                 cardView.transform.localScale = Vector3.one;
             }

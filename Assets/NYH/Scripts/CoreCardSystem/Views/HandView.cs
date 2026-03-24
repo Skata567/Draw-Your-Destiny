@@ -57,7 +57,7 @@ namespace NYH.CoreCardSystem
             {
                 float p = firstCardPosition + i * cardSpacing;
                 
-                // ✅ 로컬 좌표로 계산
+                // 로컬 좌표로 계산
                 Vector3 splinePosition = (Vector3)spline.EvaluatePosition(p);
                 Vector3 forward = (Vector3)spline.EvaluateTangent(p);
                 Vector3 up = (Vector3)spline.EvaluateUpVector(p);
@@ -65,10 +65,10 @@ namespace NYH.CoreCardSystem
                 
                 cards[i].transform.DOKill();
                 
-                // ✅ 순서를 원래 인덱스대로 복구합니다.
+                // 순서를 원래 인덱스대로 복구합니다.
                 cards[i].transform.SetSiblingIndex(i);
                 
-                // ✅ DOLocalMove를 써야 UI 좌표가 정확하게 맞습니다.
+                // DOLocalMove를 써야 UI 좌표가 정확하게 맞습니다.
                 cards[i].transform.DOLocalMove(splinePosition, duration);
                 cards[i].transform.DORotate(rotation.eulerAngles, duration);
             }
