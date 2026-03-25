@@ -33,8 +33,11 @@
         private Vector3 currentVelocity;
         private bool isDragging = false;
         private bool isPickedUp = false;
+        private bool isTargetingMode = false; // [추가] 타겟팅 모드 여부
         private Vector3 pointerDownMousePos;
         private float clickThreshold = 20f;
+        private float targetingThresholdY; // [추가] 타겟팅 모드 진입 높이
+        private Vector3 targetingCenterPos; // [추가] 타겟팅 시 카드가 위치할 곳
 
         private Camera mainCamera;
         private HandView cachedHandView;
@@ -43,6 +46,10 @@
         {
             mainCamera = Camera.main;
             cachedHandView = FindFirstObjectByType<HandView>();
+            
+            // [추가] 화면 크기에 따른 기준점 설정
+            targetingThresholdY = Screen.height * 0.35f;
+            targetingCenterPos = new Vector3(Screen.width * 0.5f, Screen.height * 0.2f, 0f);
         }
 
         private void Update()
@@ -151,6 +158,32 @@
                 ReturnToHand();
                 return;
             }
+
+            // [타겟팅 모드 처리]
+            if (isTargetingMode)
+            {
+                var placementService = FindFirstObjectByType<BuildingPlacementService>();
+                if (placementService != null)
+                {
+                    Vector3Int tilePos = placementService.GetMouseTilePos();
+                    if (placementService.TryPlaceBuilding(tilePos))
+                    {
+                        // 설치 성공
+                        isPickedUp = false;
+                        isDragging = false;
+                        AnyCardPickedUp = false;
+                        isTargetingMode = false;
+                        ActionSystem.Instance.Perform(new PlayCardGA(Card));
+                        return;
+                    }
+                }
+                
+                // 설치 실패 시 혹은 서비스 없을 시 복귀
+                ReturnToHand();
+                return;
+            }
+
+            // [일반 모드 처리 - 위로 던지기]
             Vector3 mousePos = Input.mousePosition;
             mousePos.z = -mainCamera.transform.position.z; 
             Vector2 worldPoint = mainCamera.ScreenToWorldPoint(mousePos);
@@ -169,6 +202,33 @@
         private void HandleFollowingMouse()
         {
             Vector3 mousePos = Input.mousePosition;
+
+            // [추가] 배치 효과(PlacementEffect) 확인
+            PlacementEffect placementEffect = null;
+            if (Card?.Effects != null)
+            {
+                foreach (var effect in Card.Effects)
+                {
+                    if (effect is PlacementEffect pe) { placementEffect = pe; break; }
+                }
+            }
+
+            // [타겟팅 모드 전환 로직]
+            if (placementEffect != null && isDragging)
+            {
+                if (mousePos.y > targetingThresholdY)
+                {
+                    if (!isTargetingMode) EnterTargetingMode(placementEffect);
+                    UpdateTargeting(mousePos);
+                    return;
+                }
+                else if (isTargetingMode)
+                {
+                    ExitTargetingMode();
+                }
+            }
+
+            // 일반 드래그 로직
             mousePos.z = -mainCamera.transform.position.z;
             transform.position = Vector3.SmoothDamp(transform.position, mousePos, ref currentVelocity, dragSpeed);
             float horizontalVelocity = Mathf.Abs(currentVelocity.x) > 100f ? currentVelocity.x : 0f;
@@ -176,14 +236,57 @@
             transform.rotation = Quaternion.Slerp(transform.rotation, Quaternion.Euler(0, 0, targetRotZ), Time.deltaTime * 10f);
         }
 
+        private void EnterTargetingMode(PlacementEffect effect)
+        {
+            isTargetingMode = true;
+            transform.DOKill();
+            transform.DOMove(targetingCenterPos, 0.3f).SetEase(Ease.OutBack);
+            transform.DOScale(1.2f, 0.3f);
+
+            var placementService = FindFirstObjectByType<BuildingPlacementService>();
+            if (placementService != null && effect is InstallBuildingEffect ibe)
+            {
+                placementService.StartPlacing(ibe.buildingData);
+            }
+        }
+
+        private void ExitTargetingMode()
+        {
+            isTargetingMode = false;
+            transform.DOKill();
+            transform.DOScale(1.0f, 0.2f);
+
+            var placementService = FindFirstObjectByType<BuildingPlacementService>();
+            if (placementService != null)
+            {
+                placementService.CancelPlacing();
+            }
+        }
+
+        private void UpdateTargeting(Vector3 mousePos)
+        {
+            // 카드는 중앙 고정 위치 유지
+            transform.position = Vector3.SmoothDamp(transform.position, targetingCenterPos, ref currentVelocity, dragSpeed);
+            
+            // 건물 프리뷰 업데이트
+            var placementService = FindFirstObjectByType<BuildingPlacementService>();
+            if (placementService != null)
+            {
+                Vector3Int tilePos = placementService.GetMouseTilePos();
+                placementService.UpdatePreview(tilePos);
+            }
+        }
+
 
         //카드를 다시 손패로 되돌리는 함수 (나중에 손패 위치 기억했다가 그 위치로 되돌아가게 만들어달라는 요청이 있음 ) 
         private void ReturnToHand() 
         {
+            if (isTargetingMode) ExitTargetingMode();
             isPickedUp = false;
             isDragging = false;
             AnyCardPickedUp = false;
             if (cachedHandView != null) StartCoroutine(cachedHandView.AddCard(this));
         }
+
     }
 }

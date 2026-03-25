@@ -19,9 +19,12 @@ MonoBehaviour:
   <Effects>k__BackingField:
   - rid: 7729771805414260820
   - rid: 7729771805414260821
+  - rid: -2
   references:
     version: 2
     RefIds:
+    - rid: -2
+      type: {class: , ns: , asm: }
     - rid: 7729771805414260820
       type: {class: PlayCostCardEffect, ns: , asm: Assembly-CSharp}
       data:

@@ -1,16 +1,20 @@
+using NYH.CoreCardSystem;
 using UnityEngine;
 
-public class InstallBuildingEffect : MonoBehaviour
+namespace NYH.CoreCardSystem
 {
-    // Start is called once before the first execution of Update after the MonoBehaviour is created
-    void Start()
+    [System.Serializable]
+    public class InstallBuildingEffect : PlacementEffect
     {
-        
-    }
+        [Header("설치할 건물 데이터")]
+        public BuildingData buildingData;
 
-    // Update is called once per frame
-    void Update()
-    {
-        
+        public override Sprite GetPreviewSprite() => buildingData != null ? buildingData.sprite : null;
+
+        public override GameAction GetGameAction()
+        {
+            // 좌표는 나중에 주입되므로 초기값은 zero로 생성합니다.
+            return new PlayBuildingGA(buildingData, Vector3Int.zero);
+        }
     }
 }
