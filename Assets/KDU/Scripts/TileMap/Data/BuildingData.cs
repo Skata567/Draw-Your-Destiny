@@ -28,7 +28,6 @@ public class BuildingData : ScriptableObject
 
     [Header("생산 효과")]
     public int goldPerTurn;
-    public int researchPerTurn;
     public int populationCapBonus;      // 민가: 인구 한도 증가량
 
     [Header("군사")]

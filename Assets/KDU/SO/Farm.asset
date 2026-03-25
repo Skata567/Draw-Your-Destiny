@@ -13,13 +13,15 @@ MonoBehaviour:
   m_Name: Farm
   m_EditorClassIdentifier: 
   buildingName: "\uB18D\uC7A5"
-  buildingType: 5
+  buildingType: 4
   sprite: {fileID: 7477827516038983822, guid: dc747d0a3cdf6594f9f275fdd2a48b4b, type: 3}
+  requiredEra: 0
+  isAutoUpgrade: 0
+  upgradesTo: {fileID: 0}
   goldCost: 1
-  populationCost: 1
-  width: 1
-  height: 1
-  allowedTiles: 0000000003000000
+  width: 2
+  height: 2
+  allowedTiles: 02000000
   goldPerTurn: 1
-  researchPerTurn: 0
   populationCapBonus: 0
+  soldierCapacity: 0
