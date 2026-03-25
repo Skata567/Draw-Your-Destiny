@@ -2,37 +2,68 @@
 using UnityEngine;
 using UnityEngine.Tilemaps;
 
-// 타일맵 관리 싱글톤
+// ============================================================
+// TileMapManager — 타일맵 전체 관리 싱글톤
+//
+// 담당 범위:
+//   1. 타일 데이터 (tileDataMap) — 모든 타일의 타입/소유권을 런타임에 관리
+//   2. 건물 배치/제거 — PlaceBuilding, RemoveBuilding
+//   3. 영토 소유권 — ClaimTerritory, ExpandTerritory, TransferTerritory
+//   4. Outpost 확장 — ExpandOutpostArea (City/Farmland 타일 동적 생성)
+//
+// 주요 데이터 구조:
+//   tileDataMap         : Vector3Int → TileData  (타일 상태, 소유권)
+//   buildingMap         : Vector3Int → BuildingData  (해당 위치 건물 타입, footprint 전체)
+//   buildingInstanceMap : Vector3Int → BuildingInstance  (런타임 건물 인스턴스, footprint 전체)
+//   allBuildings        : BuildingInstance 전체 리스트
+//
+// 씬의 Tilemap 레이어 참조를 Inspector에서 연결해야 한다.
+// ============================================================
 public class TileMapManager : Singleton<TileMapManager>
 {
-    [Header("지형 레이어 (Terrain Layers)")]
-    public Tilemap groundTilemap;       // 평지 (Plain, 건설 가능)
-    public Tilemap farmlandTilemap;     // 농경지 (Farmland, 농장 전용)
-    public Tilemap riverTilemap;        // 강 (River, 이동/건설 불가)
-    public Tilemap goldMineTilemap;     // 금광 (Resource)
+    [Header("지형 레이어 — Inspector에서 씬 Tilemap 연결 필요")]
+    public Tilemap groundTilemap;       // Tilemap_Ground   — Plain 지형
+    public Tilemap farmlandTilemap;     // Tilemap_Farmland — Farmland 지형 (Farm 전용)
+    public Tilemap riverTilemap;        // Tilemap_River    — 이동/건설 불가
+    public Tilemap goldMineTilemap;     // Tilemap_Gold     — 금광 자원
 
     [Header("게임플레이 레이어")]
-    public Tilemap cityTilemap;         // 도시 위치 (일반 건물 배치 불가)
-    public Tilemap buildingTilemap;     // 건물 레이어 (코드 미사용, 레이어 순서용)
+    public Tilemap cityTilemap;         // Tilemap_City     — City 타일 (일반 건물 배치 가능)
+    public Tilemap buildingTilemap;     // 코드 미사용, 레이어 렌더링 순서 확보용
 
     [Header("오버레이 레이어")]
-    public Tilemap fogTilemap;          // 안개 전쟁 오버레이
-    public Tilemap territoryTilemap;    // 영토 오버레이
-    private Tile territoryTile;
+    public Tilemap fogTilemap;          // Tilemap_Fog      — 안개 오버레이 (FogManager 제어)
+    public Tilemap territoryTilemap;    // Tilemap_Territory — 영토 색상 오버레이
+    private Tile territoryTile;         // 코드에서 생성하는 단색 영토 타일 (1×1 흰색)
 
-    [Header("Building Management")]
+    [Header("소규모 영지 타일 에셋 — Outpost 건설 시 동적 타일 생성에 사용")]
+    public Tile cityTileAsset;          // Outpost 영역(8×8)에 깔릴 City 타일 에셋
+    public Tile farmlandTileAsset;      // Outpost 테두리(2칸)에 깔릴 Farmland 타일 에셋
+
+    // ── 건물 관련 컬렉션 ──────────────────────────────────────
+    // buildingMap: footprint의 모든 타일 좌표를 키로 BuildingData를 저장
+    //              CanPlace에서 충돌 검사 시 사용
     private Dictionary<Vector3Int, BuildingData> buildingMap = new Dictionary<Vector3Int, BuildingData>();
+
+    // buildingObjects: origin 좌표 → 화면에 표시되는 GameObject (SpriteRenderer)
     private Dictionary<Vector3Int, GameObject> buildingObjects = new Dictionary<Vector3Int, GameObject>();
+
+    // 건물 오브젝트를 묶는 빈 부모 GameObject (Hierarchy 정리용)
     private Transform buildingContainer;
 
-    // BuildingInstance 추적
+    // allBuildings: 씬 전체 BuildingInstance 리스트 (순회, 턴 처리에 사용)
     private List<BuildingInstance> allBuildings = new List<BuildingInstance>();
+
+    // buildingInstanceMap: footprint 모든 타일 → BuildingInstance
+    //                      GetBuildingAt()로 특정 타일의 건물을 O(1) 조회
     private Dictionary<Vector3Int, BuildingInstance> buildingInstanceMap = new Dictionary<Vector3Int, BuildingInstance>();
 
-    // 타일별 데이터 (소유권, 안개 등)
+    // tileDataMap: 맵의 모든 타일 좌표 → TileData (타입, 소유권)
+    //             씬 시작 시 지형 Tilemap을 순회해 자동 초기화됨
     private Dictionary<Vector3Int, TileData> tileDataMap = new Dictionary<Vector3Int, TileData>();
 
-    // civID별 영토 색상: 0=플레이어(파랑), 1=AI1(빨강), 2=AI2(초록), 3=AI3(노랑)
+    // civID 0~3에 대응하는 영토 오버레이 색상 (반투명)
+    // 0=플레이어(파랑), 1=AI1(빨강), 2=AI2(초록), 3=AI3(노랑)
     private static readonly Color[] CivColors =
     {
         new Color(0.2f, 0.5f, 1f,   0.35f),
@@ -41,17 +72,19 @@ public class TileMapManager : Singleton<TileMapManager>
         new Color(1f,   0.8f, 0f,   0.35f),
     };
 
-    // 하위 호환성
+    // groundTilemap 하위 호환성 alias (이전 코드에서 tilemap으로 접근하던 곳 대응)
     public Tilemap tilemap => groundTilemap;
 
     protected override void Awake()
     {
         base.Awake();
 
+        // 씬에 Buildings 빈 오브젝트를 만들어 배치된 건물 GameObject를 그 아래로 넣음
         GameObject container = new GameObject("Buildings");
         container.transform.SetParent(transform);
         buildingContainer = container.transform;
 
+        // 영토 오버레이에 쓸 단색 흰 타일을 코드로 생성 (에셋 불필요)
         territoryTile = ScriptableObject.CreateInstance<Tile>();
         territoryTile.sprite = FogManager.CreateSolidSprite();
         territoryTile.color = Color.white;
@@ -59,21 +92,23 @@ public class TileMapManager : Singleton<TileMapManager>
         InitializeTileDataMap();
     }
 
-    // 모든 지형 레이어를 수집 후 TileData 초기화
+    // 씬의 모든 지형 Tilemap을 순회해 tileDataMap을 초기화
+    // 이후 GetAllTilePositions()로 FogManager가 전체 타일에 안개를 깐다
     private void InitializeTileDataMap()
     {
         HashSet<Vector3Int> allPositions = new HashSet<Vector3Int>();
 
-        CollectPositions(groundTilemap, allPositions);
+        CollectPositions(groundTilemap,   allPositions);
         CollectPositions(farmlandTilemap, allPositions);
-        CollectPositions(riverTilemap, allPositions);
+        CollectPositions(riverTilemap,    allPositions);
         CollectPositions(goldMineTilemap, allPositions);
-        CollectPositions(cityTilemap, allPositions);
+        CollectPositions(cityTilemap,     allPositions);
 
         foreach (Vector3Int pos in allPositions)
-            tileDataMap[pos] = new TileData(GetTileType(pos), FogState.Hidden, -1);
+            tileDataMap[pos] = new TileData(GetTileType(pos), FogState.Explored, -1);
     }
 
+    // Tilemap에서 타일이 있는 좌표만 result에 추가 (null 타일맵 안전 처리)
     private void CollectPositions(Tilemap target, HashSet<Vector3Int> result)
     {
         if (target == null) return;
@@ -86,7 +121,7 @@ public class TileMapManager : Singleton<TileMapManager>
         }
     }
 
-    // 특정 타일맵의 타일 제거 + tileDataMap 동기화
+    // 특정 Tilemap의 타일을 제거하고 tileDataMap을 최신 상태로 갱신
     public void EraseTile(Tilemap target, Vector3Int pos)
     {
         if (target == null) return;
@@ -94,21 +129,22 @@ public class TileMapManager : Singleton<TileMapManager>
         RefreshTileData(pos);
     }
 
-    // 타일 제거 후 tileDataMap 재평가
+    // 타일 제거 후 해당 좌표의 tileDataMap 재평가
+    // 모든 지형 레이어에서 타일이 사라졌으면 tileDataMap에서도 제거
     private void RefreshTileData(Vector3Int pos)
     {
-        bool exists = (groundTilemap != null && groundTilemap.HasTile(pos))
+        bool exists = (groundTilemap   != null && groundTilemap.HasTile(pos))
                    || (farmlandTilemap != null && farmlandTilemap.HasTile(pos))
-                   || (riverTilemap != null && riverTilemap.HasTile(pos))
+                   || (riverTilemap    != null && riverTilemap.HasTile(pos))
                    || (goldMineTilemap != null && goldMineTilemap.HasTile(pos))
-                   || (cityTilemap != null && cityTilemap.HasTile(pos));
+                   || (cityTilemap     != null && cityTilemap.HasTile(pos));
 
         if (exists)
         {
             if (tileDataMap.ContainsKey(pos))
                 tileDataMap[pos].type = GetTileType(pos);
             else
-                tileDataMap[pos] = new TileData(GetTileType(pos), FogState.Hidden, -1);
+                tileDataMap[pos] = new TileData(GetTileType(pos), FogState.Explored, -1);
         }
         else
         {
@@ -116,36 +152,42 @@ public class TileMapManager : Singleton<TileMapManager>
         }
     }
 
-    // FogManager에서 전체 타일 순회 시 사용
+    // FogManager.InitializeFog()에서 전체 타일에 안개를 깔 때 사용
     public IEnumerable<Vector3Int> GetAllTilePositions()
     {
         return tileDataMap.Keys;
     }
 
-    // ── 타일 타입 조회 (우선순위: 강 > 금광 > 농경지 > 도시 > 평지) ──
+    // ── 타일 타입 조회 ────────────────────────────────────────
+    // 우선순위: River > Resource > Farmland > City > Plain
+    // 여러 Tilemap 레이어가 겹쳐 있어도 가장 높은 우선순위 타입 하나만 반환
+    // 타일이 없는 위치는 River(이동 불가)로 처리
     public TileType GetTileType(Vector3Int pos)
     {
-        if (riverTilemap != null && riverTilemap.HasTile(pos)) return TileType.River;
+        if (riverTilemap    != null && riverTilemap.HasTile(pos))    return TileType.River;
         if (goldMineTilemap != null && goldMineTilemap.HasTile(pos)) return TileType.Resource;
         if (farmlandTilemap != null && farmlandTilemap.HasTile(pos)) return TileType.Farmland;
-        if (cityTilemap != null && cityTilemap.HasTile(pos)) return TileType.City;
-        if (groundTilemap != null && groundTilemap.HasTile(pos)) return TileType.Plain;
-        return TileType.River; // 타일 없음 = 이동 불가
+        if (cityTilemap     != null && cityTilemap.HasTile(pos))     return TileType.City;
+        if (groundTilemap   != null && groundTilemap.HasTile(pos))   return TileType.Plain;
+        return TileType.River; // 타일 없음 = 이동/건설 불가
     }
 
     // ── 위치 유효성 확인 ──────────────────────────────────────────
+    // tileDataMap에 등록된 좌표만 유효 (맵 밖/타일 없는 곳은 false)
     public bool IsValidPosition(Vector3Int pos)
     {
         return tileDataMap.ContainsKey(pos);
     }
 
     // ── 소유권 조회 ───────────────────────────────────────────────
+    // 반환값: 0~3(문명ID) 또는 -1(미점령)
     public int GetOwner(Vector3Int pos)
     {
         return tileDataMap.TryGetValue(pos, out TileData data) ? data.ownerCivID : -1;
     }
 
     // ── 단일 타일 소유권 설정 ────────────────────────────────────
+    // civID = -1이면 영토 오버레이 타일 제거(미점령 표시)
     public void SetOwner(Vector3Int pos, int civID)
     {
         if (!tileDataMap.ContainsKey(pos)) return;
@@ -153,7 +195,8 @@ public class TileMapManager : Singleton<TileMapManager>
         RefreshTerritoryVisual(pos, civID);
     }
 
-    // ── BFS로 반경 내 타일 일괄 점령 ────────────────────────────
+    // ── BFS로 center 기준 반경 내 타일을 civID로 일괄 점령 ──────
+    // 도시 건설 시 초기 영토 확보, Outpost 설치 후 영토 등록 등에 사용
     public void ClaimTerritory(Vector3Int center, int civID, int radius)
     {
         Queue<Vector3Int> queue = new Queue<Vector3Int>();
@@ -183,7 +226,8 @@ public class TileMapManager : Singleton<TileMapManager>
         }
     }
 
-    // ── 문명 영토 1칸 확장 ──────────────────────────────────────
+    // ── civID 영토의 모든 경계 타일에서 미점령 인접 타일 1칸씩 확장 ──
+    // 매 턴 자동 영토 확장 처리에 사용 (미구현)
     public void ExpandTerritory(int civID)
     {
         List<Vector3Int> toAdd = new List<Vector3Int>();
@@ -205,7 +249,7 @@ public class TileMapManager : Singleton<TileMapManager>
             SetOwner(pos, civID);
     }
 
-    // ── 문명 영토 전체 이전 (도시 점령 시) ──────────────────────
+    // ── 도시 점령 시 패배 문명의 모든 영토를 승리 문명으로 이전 ──
     public void TransferTerritory(int fromCivID, int toCivID)
     {
         List<Vector3Int> targets = new List<Vector3Int>();
@@ -221,6 +265,7 @@ public class TileMapManager : Singleton<TileMapManager>
     }
 
     // ── 영토 오버레이 색상 갱신 ─────────────────────────────────
+    // SetOwner() 호출 시 자동으로 불림 — 외부에서 직접 호출 불필요
     private void RefreshTerritoryVisual(Vector3Int pos, int civID)
     {
         if (territoryTilemap == null || territoryTile == null) return;
@@ -236,18 +281,22 @@ public class TileMapManager : Singleton<TileMapManager>
         territoryTilemap.SetColor(pos, CivColors[civID]);
     }
 
-    // ── 건물 조회 ────────────────────────────────────────────────
+    // ── 특정 타일에 있는 BuildingInstance 반환 (없으면 null) ────
+    // FogManager에서 건물 렌더링 시 사용
     public BuildingInstance GetBuildingAt(Vector3Int pos)
     {
         return buildingInstanceMap.TryGetValue(pos, out BuildingInstance b) ? b : null;
     }
 
+    // 씬 전체 건물 리스트 반환 (턴 처리 시 goldPerTurn 등 일괄 적용에 사용 예정)
     public List<BuildingInstance> GetAllBuildings()
     {
         return allBuildings;
     }
 
-    // ── 건물 배치 가능 확인 ──────────────────────────────────────
+    // ── 건물 배치 가능 여부 확인 ─────────────────────────────────
+    // clickPos 기준으로 origin을 계산한 뒤 footprint 전체를 검사
+    // 조건: 맵 안 + 강 없음 + 건물 없음 + allowedTiles 타입 일치
     public bool CanPlace(Vector3Int clickPos, BuildingData building)
     {
         Vector3Int origin = GetOrigin(clickPos, building);
@@ -261,7 +310,6 @@ public class TileMapManager : Singleton<TileMapManager>
                 if (!IsValidPosition(checkPos)) return false;
 
                 if (riverTilemap != null && riverTilemap.HasTile(checkPos)) return false;
-                if (cityTilemap != null && cityTilemap.HasTile(checkPos)) return false;
                 if (buildingMap.ContainsKey(checkPos)) return false;
 
                 TileType tileType = GetTileType(checkPos);
@@ -310,6 +358,14 @@ public class TileMapManager : Singleton<TileMapManager>
         allBuildings.Add(instance);
         foreach (Vector3Int pos in footprint)
             buildingInstanceMap[pos] = instance;
+
+        // Outpost 배치 시: 8×8 City 타일 + 2칸 Farmland 테두리 생성
+        if (building.buildingType == BuildingType.Outpost)
+        {
+            ExpandOutpostArea(origin);
+            // 8×8 영역 시작점(origin -3, -3)부터 크기 8로 영구 시야 등록
+            FogManager.Instance?.OnOutpostBuilt(new Vector3Int(origin.x - 3, origin.y - 3, 0), 8);
+        }
 
         FogManager.Instance?.OnBuildingPlaced(instance);
 
@@ -511,15 +567,52 @@ public class TileMapManager : Singleton<TileMapManager>
     // -------------------------------------------------
     public Vector3 GetCellCenterWorld(Vector3Int pos)
     {
-        // -------------------------------------------------
-        // 1. 타일맵의 셀 좌표를 월드 좌표로 변환
-        // -------------------------------------------------
-        // GetCellCenterWorld(pos)는
-        // 해당 타일의 "중앙 위치"를 반환한다
-        //
-        // 예:
-        // 타일 좌표가 (3,2,0)이면
-        // 그 타일 칸의 한가운데 월드 좌표를 돌려줌
         return groundTilemap.GetCellCenterWorld(pos);
+    }
+
+    // ── 소규모 영지 확장 ─────────────────────────────────────────
+    // origin 기준 8×8 City 타일 생성 + 2칸 Farmland 테두리 생성
+    private void ExpandOutpostArea(Vector3Int origin)
+    {
+        // 8×8 City 영역 (origin 기준 -3 ~ +4)
+        for (int dx = -3; dx <= 4; dx++)
+        for (int dy = -3; dy <= 4; dy++)
+        {
+            SetCityTile(origin + new Vector3Int(dx, dy, 0));
+        }
+
+        // 2칸 Farmland 테두리 (12×12 외곽 - 8×8 내부)
+        for (int dx = -5; dx <= 6; dx++)
+        for (int dy = -5; dy <= 6; dy++)
+        {
+            if (dx >= -3 && dx <= 4 && dy >= -3 && dy <= 4) continue;
+            SetFarmlandTile(origin + new Vector3Int(dx, dy, 0));
+        }
+    }
+
+    // City 타일 1칸 설정 (강 위 / 맵 밖 스킵)
+    private void SetCityTile(Vector3Int pos)
+    {
+        if (cityTileAsset == null) return;
+        if (!tileDataMap.ContainsKey(pos)) return;
+        if (riverTilemap != null && riverTilemap.HasTile(pos)) return;
+
+        cityTilemap.SetTile(pos, cityTileAsset);
+        cityTilemap.SetTileFlags(pos, TileFlags.None);
+        tileDataMap[pos].type = TileType.City;
+    }
+
+    // Farmland 타일 1칸 설정 (강 / City / 맵 밖 스킵, 중복 배치 방지)
+    private void SetFarmlandTile(Vector3Int pos)
+    {
+        if (farmlandTileAsset == null) return;
+        if (!tileDataMap.ContainsKey(pos)) return;
+        if (riverTilemap != null && riverTilemap.HasTile(pos)) return;
+        if (cityTilemap != null && cityTilemap.HasTile(pos)) return;
+        if (farmlandTilemap != null && farmlandTilemap.HasTile(pos)) return;
+
+        farmlandTilemap.SetTile(pos, farmlandTileAsset);
+        farmlandTilemap.SetTileFlags(pos, TileFlags.None);
+        tileDataMap[pos].type = TileType.Farmland;
     }
 }

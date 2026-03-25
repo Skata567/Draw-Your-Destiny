@@ -2,16 +2,29 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Tilemaps;
 
-// 게임 시작 시 도시 영역(BFS 감지) 8개 중 4곳 랜덤 선택, 나머지 city+farmland 제거
+// ============================================================
+// CitySpawnManager — 게임 시작 시 도시(문명) 초기 배치 담당
+//
+// 흐름:
+//   1. cityTilemap에서 BFS로 연결된 city 타일 그룹을 "도시 영역" 단위로 탐지
+//   2. 탐지된 영역 중 4개를 랜덤 선택 (플레이어 1 + AI 3)
+//   3. 미선택 도시 영역의 city/farmland 타일을 맵에서 제거
+//   4. 선택된 각 도시에 문명 ID(civID) 할당, 영토 점령, 플레이어 안개 해제
+//
+// [DefaultExecutionOrder(10)] — TileMapManager/FogManager 초기화 후 실행
+//
+// 씬에 미리 깔아 둔 city 타일 영역 수가 4개 미만이면 에러 로그 출력
+// ============================================================
 [DefaultExecutionOrder(10)]
 public class CitySpawnManager : MonoBehaviour
 {
     [Header("시야 설정")]
-    public int initialVisionRadius = 12; // 20x20 도시 커버 (중심→모서리 ~14칸)
+    public int initialVisionRadius = 12; // 플레이어 초기 안개 해제 반경 (도시 중심 기준)
 
     private TileMapManager tileMapManager;
 
-    // civID 순서대로 선택된 도시 중심 좌표 (0=플레이어, 1~3=AI)
+    // 씬 시작 후 배치된 도시의 중심 좌표 목록 (civID 순서: 0=플레이어, 1~3=AI)
+    // 외부에서 각 문명의 수도 위치를 참조할 때 사용
     private List<Vector3Int> spawnedCityCenters = new List<Vector3Int>();
     public List<Vector3Int> SpawnedCityCenters => spawnedCityCenters;
 
