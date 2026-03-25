@@ -1,11 +1,11 @@
 // 타일 지형 타입
 public enum TileType
 {
-    Plain,      // 평지 (건설 가능)
+    Plain,      // 평지 (소규모 영지 건설 가능)
     River,      // 강 (건설 불가, 이동 불가)
     Farmland,   // 농경지 (농장 전용)
-    Resource,   // 자원 타일 (금광 등)
-    City        // 도시 타일 (일반 건물 배치 불가)
+    Resource,   // 자원 타일 (금광, 이동 불가)
+    City        // 도시 타일 (건물 배치 가능)
 }
 
 // 건물 타입
