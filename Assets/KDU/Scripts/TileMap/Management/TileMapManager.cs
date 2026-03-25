@@ -1,4 +1,4 @@
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Tilemaps;
 
@@ -400,5 +400,48 @@ public class TileMapManager : Singleton<TileMapManager>
                 positions.Add(origin + new Vector3Int(x, y, 0));
 
         return positions;
+    }
+
+    // --------건들ㄴ--------------------------------
+    public bool IsWalkable(Vector3Int pos)
+    {
+        // 땅 타일이 없으면 이동 불가
+        if (groundTilemap == null || !groundTilemap.HasTile(pos))
+            return false;
+
+        // 강 타일이면 이동 불가
+        if (riverTilemap != null && riverTilemap.HasTile(pos))
+            return false;
+
+        // 건물이 있으면 이동 불가
+        if (buildingInstanceMap != null && buildingInstanceMap.ContainsKey(pos))
+            return false;
+
+        return true;
+    }
+
+    public List<Vector3Int> GetNeighbors(Vector3Int current)
+    {
+        List<Vector3Int> neighbors = new List<Vector3Int>();
+
+        Vector3Int[] directions = new Vector3Int[]
+        {
+        new Vector3Int(1, 0, 0),
+        new Vector3Int(-1, 0, 0),
+        new Vector3Int(0, 1, 0),
+        new Vector3Int(0, -1, 0)
+        };
+        foreach (var dir in directions)
+        {
+            Vector3Int next = current + dir;
+
+            if (IsWalkable(next))
+                neighbors.Add(next);
+        }
+        return neighbors;
+    }
+    public Vector3 GetCellCenterWorld(Vector3Int cellPos)
+    {
+        return groundTilemap.GetCellCenterWorld(cellPos);
     }
 }
