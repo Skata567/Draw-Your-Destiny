@@ -116,10 +116,10 @@ TextureImporter:
       name: "ui\uD2C02_0"
       rect:
         serializedVersion: 2
-        x: 4
-        y: 1
-        width: 1278
-        height: 490
+        x: 7
+        y: 7
+        width: 1272
+        height: 484
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
