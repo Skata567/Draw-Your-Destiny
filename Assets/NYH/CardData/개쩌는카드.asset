@@ -17,23 +17,19 @@ MonoBehaviour:
   <Image>k__BackingField: {fileID: -5020799733626797212, guid: c10b3c5338d9e914fb4398031c8b7051,
     type: 3}
   <Effects>k__BackingField:
-  - rid: 1012689262540226645
-  - rid: 4274341048764858582
-  - rid: 4274341048764858581
+  - rid: 7729771852153749585
+  - rid: 7729771852153749584
+  - rid: -2
   references:
     version: 2
     RefIds:
-    - rid: 1012689262540226645
-      type: {class: PlayCostCardEffect, ns: , asm: Assembly-CSharp}
-      data:
-        playCardCost: 5
-    - rid: 4274341048764858581
-      type: {class: RandomChanceEffect, ns: , asm: Assembly-CSharp}
-      data:
-        options:
-        - weight: 50
-        - weight: 50
-    - rid: 4274341048764858582
+    - rid: -2
+      type: {class: , ns: , asm: }
+    - rid: 7729771852153749584
       type: {class: DrawCardEffect, ns: , asm: Assembly-CSharp}
       data:
-        drawAmount: 2
+        drawAmount: 1
+    - rid: 7729771852153749585
+      type: {class: ColdCardEffect, ns: , asm: Assembly-CSharp}
+      data:
+        costAmount: 6

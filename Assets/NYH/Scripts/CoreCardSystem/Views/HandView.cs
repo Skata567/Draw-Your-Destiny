@@ -71,6 +71,7 @@ namespace NYH.CoreCardSystem
                 // DOLocalMove를 써야 UI 좌표가 정확하게 맞습니다.
                 cards[i].transform.DOLocalMove(splinePosition, duration);
                 cards[i].transform.DORotate(rotation.eulerAngles, duration);
+                cards[i].transform.DOScale(Vector3.one, duration); // [추가] 정렬 시 크기를 항상 1로 리셋
             }
             yield return new WaitForSeconds(duration);
         }

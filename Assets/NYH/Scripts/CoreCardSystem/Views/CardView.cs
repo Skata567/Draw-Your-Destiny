@@ -162,6 +162,8 @@ namespace NYH.CoreCardSystem
             // [타겟팅 모드 처리]
             if (isTargetingMode)
             {
+                /* 아직 기능 미구현으로 인한 주석 처리
+                // 설치 성공 여부를 체크하는 로직
                 var placementService = FindFirstObjectByType<BuildingPlacementService>();
                 if (placementService != null)
                 {
@@ -181,8 +183,10 @@ namespace NYH.CoreCardSystem
                         return;
                     }
                 }
+                */
                 
-                // 설치 실패 시 혹은 서비스 없을 시 복귀
+                // 현재는 기능이 없으므로 일단 타겟팅 모드에서 클릭하면 손패로 돌아가게 함
+                Debug.Log("[CardView] 빌딩 설치 기능이 아직 구현되지 않았습니다.");
                 ReturnToHand();
                 return;
             }
@@ -218,8 +222,7 @@ namespace NYH.CoreCardSystem
             }
 
             // [타겟팅 모드 전환 로직]
-            if (placementEffect != null && isDragging)
-            if (placementEffect != null && (isDragging || isPickedUp))
+            if (placementEffect != null && (isDragging || isPickedUp)) // 중복 if문 수정
             {
                 if (mousePos.y > targetingThresholdY)
                 {
@@ -252,11 +255,13 @@ namespace NYH.CoreCardSystem
             // [추가] 카드 배치 중에는 턴 종료 버튼을 막음
             // if (GameManager.Instance != null) GameManager.Instance.SetTurnEndButtonInteractable(false);
 
+            /* 아직 기능 미구현으로 인한 주석 처리
             var placementService = FindFirstObjectByType<BuildingPlacementService>();
             if (placementService != null && effect is InstallBuildingEffect ibe)
             {
                 placementService.StartPlacing(ibe.buildingData);
             }
+            */
         }
 
         private void ExitTargetingMode()
@@ -269,11 +274,13 @@ namespace NYH.CoreCardSystem
             // [주석 처리] 배치 모드 종료 시 턴 종료 버튼 다시 활성화
             // if (GameManager.Instance != null) GameManager.Instance.SetTurnEndButtonInteractable(true);
 
+            /* 아직 기능 미구현으로 인한 주석 처리
             var placementService = FindFirstObjectByType<BuildingPlacementService>();
             if (placementService != null)
             {
                 placementService.CancelPlacing();
             }
+            */
         }
 
         private void UpdateTargeting(Vector3 mousePos)
@@ -282,30 +289,35 @@ namespace NYH.CoreCardSystem
             transform.position = Vector3.SmoothDamp(transform.position, targetingCenterPos, ref currentVelocity, dragSpeed);
             
             // 건물 프리뷰 업데이트
+            /* 아직 기능 미구현으로 인한 주석 처리
             var placementService = FindFirstObjectByType<BuildingPlacementService>();
             if (placementService != null)
             {
                 Vector3Int tilePos = placementService.GetMouseTilePos();
                 placementService.UpdatePreview(tilePos);
             }
+            */
         }
 
 
         //카드를 다시 손패로 되돌리는 함수 (나중에 손패 위치 기억했다가 그 위치로 되돌아가게 만들어달라는 요청이 있음 ) 
         private void ReturnToHand() 
         {
+            // [추가] 손패로 돌아올 때 크게 보여주던 호버 미리보기를 확실히 끕니다.
+            if (CardViewHoverSystem.Instance != null) CardViewHoverSystem.Instance.Hide();
+
             if (isTargetingMode) ExitTargetingMode();
             isPickedUp = false;
             isDragging = false;
             AnyCardPickedUp = false;
 
             // [추가] 손패로 돌아올 때 혹시 커져있거나 기울어져 있는 상태를 확실히 초기화
-            transform.DOKill();
-            transform.DOScale(Vector3.one, 0.2f);
-            transform.DORotate(Vector3.zero, 0.2f);
+            // 트윈이 HandView에서 끊기지 않도록 여기서 즉시 초기화하거나 HandView에서 처리하게 합니다.
+            transform.localScale = Vector3.one; 
+            transform.rotation = Quaternion.identity;
 
             if (cachedHandView != null) StartCoroutine(cachedHandView.AddCard(this));
         }
 
     }
-}
+}   
