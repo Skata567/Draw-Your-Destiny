@@ -42,6 +42,9 @@
             ActionSystem.AttachPerformer<ChooseOneGA>(action => Perform(action));                 //선택 카드 액션
             ActionSystem.AttachPerformer<ResearchpointsGA>(action => Perform(action));            //연구 포인트 획득 액션
             ActionSystem.AttachPerformer<IncreasePopulationGA>(action => Perform(action));        //인구 증가 획득 액션
+            ActionSystem.AttachPerformer<ContinueBehaviourGA>(action => Perform(action));
+            ActionSystem.AttachPerformer<PerformEffectGA>(action => Perform(action));
+
 
             Debug.Log("[CardSystem] 초기화 및 액션 등록 완료");
         }
@@ -125,6 +128,15 @@
             else if (action is IncreasePopulationGA increasPoulationGA)
             {
                 GameManager.Instance.IncreasePopulationCap(increasPoulationGA.Amount);
+                yield return null;
+            }
+            else if (action is ContinueBehaviourGA continueGA)
+            {
+                OngoingEffectSystem.Instance.Register(
+                    continueGA.SourceCard,
+                    continueGA.StartEffectIndex,
+                    continueGA.TurnAmount
+                );
                 yield return null;
             }
         }
@@ -217,9 +229,10 @@
             
             if (playCardGA.Card?.Effects != null)
             {
-                foreach(var effect in playCardGA.Card.Effects)
+                for (int i = 0; i < playCardGA.Card.Effects.Count; i++)
                 {
-                    ActionSystem.Instance.AddReaction(new PerformEffectGA(effect));
+                    var effect = playCardGA.Card.Effects[i];
+                    ActionSystem.Instance.AddReaction(new PerformEffectGA(playCardGA.Card, effect, i));
                 }
             }
         }

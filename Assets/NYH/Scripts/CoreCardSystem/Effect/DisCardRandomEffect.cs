@@ -1,4 +1,4 @@
-using NYH.CoreCardSystem;
+﻿using NYH.CoreCardSystem;
 using UnityEngine;
 
 /*
@@ -33,7 +33,7 @@ public class DiscardRandomEffect : Effect
     [Header("랜덤으로 버릴 장수")]
     [SerializeField] private int discardAmount; 
 
-    public override GameAction GetGameAction()
+    public override GameAction GetGameAction(int effectIndex = 0, Card sourceCard = null)
     {
         // [연결 지점] 
         // 여기서 DiscardRandomGA라는 명령서를 생성하여 시스템에 전달합니다.

@@ -1,4 +1,4 @@
-using NYH.CoreCardSystem;
+﻿using NYH.CoreCardSystem;
 using UnityEngine;
 
 namespace NYH.CoreCardSystem
@@ -10,6 +10,6 @@ namespace NYH.CoreCardSystem
         public abstract Sprite GetPreviewSprite();
         
         // 설치가 확정되었을 때 실행할 액션을 반환
-        public override abstract GameAction GetGameAction();
+        public override abstract GameAction GetGameAction(int effectIndex = 0, Card sourceCard = null);
     }
 }

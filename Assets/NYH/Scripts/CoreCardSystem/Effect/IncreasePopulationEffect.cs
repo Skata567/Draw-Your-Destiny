@@ -1,12 +1,12 @@
-using NYH.CoreCardSystem;
+ï»¿using NYH.CoreCardSystem;
 using UnityEngine;
 
 public class IncreasePopulationffect : Effect
 {
-    [Header("Áõ°¡ ½ÃÅ³ ÀÎ±¸ ÇÑµµ")]
+    [Header("ì¦ê°€ ì‹œí‚¬ ì¸êµ¬ í•œë„")]
     [SerializeField] private int increasePopulationGA;
 
-    public override GameAction GetGameAction()
+    public override GameAction GetGameAction(int effectIndex = 0, Card sourceCard = null)
     {
         return new IncreasePopulationGA(increasePopulationGA);
     }

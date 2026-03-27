@@ -1,4 +1,4 @@
-using UnityEngine;
+﻿using UnityEngine;
 
 // ============================================================
 // GameManager — 게임 전체 상태 관리 (PersistentSingleton)
@@ -71,6 +71,7 @@ public class GameManager : PersistentSingleton<GameManager>
     {
         endTurn = true;
         startTurn = false;
+        OngoingEffectSystem.Instance.OnTurnStartOrEnd();
     }
 
     // ── 재화 관리 ─────────────────────────────────────────────

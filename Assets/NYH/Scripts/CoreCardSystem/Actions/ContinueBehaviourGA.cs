@@ -1,13 +1,16 @@
-﻿using UnityEngine;
-namespace NYH.CoreCardSystem
-{
-	public class ContinueBehaviour : GameAction 
-	{
-		public int Amount { get; private set; }
+﻿using NYH.CoreCardSystem;
+using UnityEngine;
 
-		public ContinueBehaviour(int amount)
-		{
-			Amount = amount;
-		}
-	}
+public class ContinueBehaviourGA : GameAction
+{
+    public Card SourceCard { get; }
+    public int StartEffectIndex { get; }
+    public int TurnAmount { get; private set; }
+
+    public ContinueBehaviourGA(Card sourceCard, int startEffectIndex, int turnAmount)
+    {
+        SourceCard = sourceCard;
+        StartEffectIndex = startEffectIndex;
+        TurnAmount = turnAmount;
+    }
 }

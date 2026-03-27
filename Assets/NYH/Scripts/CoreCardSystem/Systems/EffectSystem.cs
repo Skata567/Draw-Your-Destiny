@@ -1,4 +1,4 @@
-using NYH.CoreCardSystem;
+﻿using NYH.CoreCardSystem;
 using System.Collections;
 using UnityEngine;
 
@@ -33,7 +33,8 @@ public class EffectSystem : MonoBehaviour
 
         // 1. 효과 데이터(ScriptableObject)로부터 실제 실행할 액션을 가져옵니다.
         // 예: DrawCardEffect라면 여기서 DrawCardsGA(2) 같은 액션을 리턴합니다.
-        GameAction effectAction = performEffectGA.Effect.GetGameAction();
+        GameAction effectAction = performEffectGA.Effect.GetGameAction(
+            performEffectGA.EffectIndex, performEffectGA.SourceCard);
 
         // 2. 가져온 진짜 액션을 다시 ActionSystem의 연쇄 반응 리스트에 넣습니다.
         // 이렇게 하면 '카드 내기' 동작 중에 '카드 뽑기' 동작이 순차적으로 실행됩니다.

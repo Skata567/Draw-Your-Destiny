@@ -1,4 +1,4 @@
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using NYH.CoreCardSystem;
 using UnityEngine;
 
@@ -18,7 +18,7 @@ public class RandomChanceEffect : Effect
     [Header("발동 후보 효과 목록")]
     [SerializeField] private List<EffectOption> options = new List<EffectOption>();
 
-    public override GameAction GetGameAction()
+    public override GameAction GetGameAction(int effectIndex = 0, Card sourceCard = null)
     {
         if (options == null || options.Count == 0) return null;
 
