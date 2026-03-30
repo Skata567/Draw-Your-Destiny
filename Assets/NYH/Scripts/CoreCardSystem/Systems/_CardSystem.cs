@@ -1,4 +1,4 @@
-﻿/*namespace NYH.CoreCardSystem
+﻿namespace NYH.CoreCardSystem
 {
     using System.Collections.Generic;
     using UnityEngine;
@@ -28,10 +28,10 @@
         private List<Card> discardPile = new();    // 무덤(버려진 카드)
         private List<Card> extinctionPile = new(); // 소멸칸
 
-		protected override void Awake()
+        protected override void Awake()
         {
             base.Awake();
-            
+
             // 액션 연결 (AttachPerformer)
             ActionSystem.AttachPerformer<DrawCardsGA>(action => Perform(action));                 //카드 드로우 액션
             ActionSystem.AttachPerformer<PlayCardGA>(action => Perform(action));                  //카드 플레이 액션
@@ -141,16 +141,16 @@
             }
             else if (action is CostPlusGA costPlusGA)
             {
-				costPlusGA.SourceCard.Cost += costPlusGA.Cost;
+                costPlusGA.SourceCard.Cost += costPlusGA.Cost;
                 yield return null;
-                
+
                 // 코스트 변경 후 즉시 UI 갱신
                 CardView[] allViews = Object.FindObjectsByType<CardView>(FindObjectsSortMode.None);
                 foreach (var view in allViews)
                 {
                     if (view.Card == costPlusGA.SourceCard && !view.IsHoverPreview) view.Setup(view.Card);
                 }
-			}
+            }
             else if (action is ZeroCostHandGA zeroCostHandGA)
             {
                 // 1. 인스펙터에서 설정한 cardAmount만큼의 카드 코스트를 costAmount로 변경합니다.
@@ -159,7 +159,7 @@
                 {
                     // cardAmount가 0이면(혹은 설정된 수만큼) 손패 전체 혹은 지정된 수만큼 변경
                     if (zeroCostHandGA.CardAmount > 0 && modifiedCount >= zeroCostHandGA.CardAmount) break;
-                    
+
                     card.Cost = zeroCostHandGA.CostAmount;
                     modifiedCount++;
                 }
@@ -227,7 +227,7 @@
         {
             hand.Remove(playCardGA.Card);
             CardView cardView = handView.RemoveCard(playCardGA.Card);
-            
+
             if (cardView == null)
             {
                 CardView[] allViews = FindObjectsByType<CardView>(FindObjectsSortMode.None);
@@ -260,7 +260,7 @@
                 yield return DiscardCardAnimation(cardView);
             }
             // ---------------------------
-            
+
             if (playCardGA.Card?.Effects != null)
             {
                 for (int i = 0; i < playCardGA.Card.Effects.Count; i++)
@@ -385,6 +385,5 @@
 
             CardListUI.Instance.Show(shuffledCopy, "무덤 확인");
         }
-	}
+    }
 }
-*/
