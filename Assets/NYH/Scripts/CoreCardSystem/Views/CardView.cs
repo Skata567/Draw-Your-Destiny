@@ -15,7 +15,7 @@ namespace NYH.CoreCardSystem
         [Header("UI Text Objects")]
         [SerializeField] private TMP_Text titleText;
         [SerializeField] private TMP_Text descriptionText;
-        [SerializeField] private TMP_Text costText; // [수정] manaText -> costText로 명칭 통일
+        [SerializeField] private TMP_Text costText; 
 
         [Header("UI Image Objects")]
         [SerializeField] private Image cardArtImage;
@@ -164,6 +164,8 @@ namespace NYH.CoreCardSystem
             {
                 /* 아직 기능 미구현으로 인한 주석 처리
                 // 설치 성공 여부를 체크하는 로직
+                */
+
                 var placementService = FindFirstObjectByType<BuildingPlacementService>();
                 if (placementService != null)
                 {
@@ -183,7 +185,7 @@ namespace NYH.CoreCardSystem
                         return;
                     }
                 }
-                */
+               
                 
                 // 현재는 기능이 없으므로 일단 타겟팅 모드에서 클릭하면 손패로 돌아가게 함
                 Debug.Log("[CardView] 빌딩 설치 기능이 아직 구현되지 않았습니다.");
