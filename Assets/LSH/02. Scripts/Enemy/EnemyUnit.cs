@@ -18,6 +18,7 @@ public class EnemyUnit : MonoBehaviour
     [SerializeField] public int age;
     [SerializeField] private AgeGroup ageGroup;
     [SerializeField] private float naturalDeathChance;
+    [SerializeField] private Gender gender;
 
     [Header("직업")]
     [SerializeField] public Job job;
@@ -41,20 +42,20 @@ public class EnemyUnit : MonoBehaviour
     }
     public void UnitAppear() //유닛이 나올 때 초기화하는거
     {
-        naturalDeathChance = unitInfo.startNaturalDeathChance;
+        naturalDeathChance = enemyInfo.startNaturalDeathChance;
         gender = Random.value < 0.5f ? Gender.Male : Gender.Female;
         ageGroup = AgeGroup.Baby; //처음 나올 때는 응애
-        age = unitInfo.babyStartAge;
+        age = enemyInfo.babyStartAge;
         switch (job) //직업에 따른 초기화를 여기서 하도록
         {
             case Job.Farmer:
-                koreanArmy = false;
+               
                 break;
             case Job.Soldier:
-                koreanArmy = true;
+                
                 break;
             case Job.Miner:
-                koreanArmy = false;
+             
                 break;
 
             default:
@@ -84,7 +85,7 @@ public class EnemyUnit : MonoBehaviour
     void Dead() //죽는거는 이거
     {
         //UnitAppear(); //죽으면 초기화
-        humanPool.ReturnHuman(this.gameObject);
+        enemyPool.ReturnHuman(this.gameObject);
     }
     public void ChangeAgeGroup()//나이 그룹 바뀌는거는 이거
     {
@@ -107,13 +108,13 @@ public class EnemyUnit : MonoBehaviour
         switch (ageGroup)
         {
             case AgeGroup.Baby:
-                naturalDeathChance = unitInfo.startNaturalDeathChance;
+                naturalDeathChance = enemyInfo.startNaturalDeathChance;
                 break;
             case AgeGroup.Adult:
-                naturalDeathChance = unitInfo.naturalDeathIncreasePerTurn * 2;
+                naturalDeathChance = enemyInfo.naturalDeathIncreasePerTurn * 2;
                 break;
             case AgeGroup.Old:
-                naturalDeathChance = 0.7f + unitInfo.naturalDeathIncreasePerTurn * (age - 14f);
+                naturalDeathChance = 0.7f + enemyInfo.naturalDeathIncreasePerTurn * (age - 14f);
                 break;
         }
     }
@@ -121,7 +122,7 @@ public class EnemyUnit : MonoBehaviour
     public void UseAdultUnitCard() //만약 어른을 소환하는 카드를 사용시
     {
         ageGroup = AgeGroup.Adult;
-        age = unitInfo.adultStartAge;
+        age = enemyInfo.adultStartAge;
         Debug.Log("어른 소환 카드 사용!");
     }
 
