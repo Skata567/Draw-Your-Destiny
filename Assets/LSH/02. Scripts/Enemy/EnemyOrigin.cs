@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+using System.Collections;
+using System.Collections.Generic;
 using UnityEngine;
 
 public enum EnemyActionType
@@ -33,20 +34,75 @@ public class EnemyOrigin : MonoBehaviour
     [SerializeField] protected int enemyID;
     [SerializeField] protected EnemyUnitPool enemyUnitPool;
 
+    [Header("영주성")]
+    [Tooltip("이 적의 영주성 스프라이트 — EnemyA/B/C Inspector에서 각각 설정")]
+    public Sprite lordCastleSprite;
+    [Tooltip("영주성 최대 체력")]
+    public int lordCastleMaxHP = 100;
+
+    // 같은 GameObject에 붙은 LordCastle 컴포넌트 (Start에서 자동으로 가져옴)
+    protected LordCastle lordCastle;
+
     protected virtual void Start()
     {
         enemyUnitPool = transform.parent.GetComponentInChildren<EnemyUnitPool>();
 
+        // EnemyA/B/C 자체가 영주성이므로 같은 오브젝트에서 가져옴
+        lordCastle = GetComponent<LordCastle>();
+
         AddTurnList();
         GameStartEnemyInfo();
+
+        // CitySpawnManager가 DefaultExecutionOrder(10)으로 나중에 실행되므로
+        // 한 프레임 후에 영주성 위치를 잡아야 도시 중심 좌표가 확정됨
+        StartCoroutine(InitLordCastleNextFrame());
     }
 
-    private void Update()
+    // 영주성 위치 + 스프라이트 초기화 (1프레임 대기 후 실행)
+    private IEnumerator InitLordCastleNextFrame()
     {
-        if (Input.GetKeyDown(KeyCode.E)) // 실험용
+        yield return null;
+
+        if (lordCastle == null)
         {
-            StartEnemyTurn();
+            Debug.LogWarning($"[EnemyOrigin] enemyID={enemyID}: LordCastle 컴포넌트가 없습니다.");
+            yield break;
         }
+
+        // CitySpawnManager에서 도시 중심 좌표 가져오기
+        // SpawnedCityCenters 순서: [0]=플레이어, [1]=AI-A, [2]=AI-B, [3]=AI-C
+        CitySpawnManager citySpawnManager = FindFirstObjectByType<CitySpawnManager>();
+        TileMapManager tileMapManager = TileMapManager.Instance;
+        if (citySpawnManager == null || tileMapManager == null || tileMapManager.groundTilemap == null)
+        {
+            Debug.LogWarning($"[EnemyOrigin] enemyID={enemyID}: 영주성 배치에 필요한 매니저를 찾을 수 없습니다.");
+            yield break;
+        }
+
+        // 시작 도시 bounds 기준으로 4x4 영주성의 실제 중심을 계산
+        // 나중에 소규모 영지(예: 8x8)에서도 해당 영지 bounds와 tileSize=2만 넘기면 같은 방식 사용 가능
+        if (citySpawnManager.TryGetSpawnedCityBounds(enemyID, out BoundsInt cityBounds))
+        {
+            lordCastle.Initialize(lordCastleSprite, tileMapManager.groundTilemap, cityBounds, lordCastleMaxHP);
+            Debug.Log($"[EnemyOrigin] enemyID={enemyID}: 영주성을 bounds 중심에 배치 완료.");
+            yield break;
+        }
+        // bounds 정보가 없으면 기존 중심 타일 기준으로 한 번 더 시도
+        if (citySpawnManager == null || citySpawnManager.SpawnedCityCenters.Count <= enemyID)
+        {
+            Debug.LogWarning($"[EnemyOrigin] enemyID={enemyID}: 도시 중심 좌표를 찾을 수 없습니다.");
+            yield break;
+        }
+
+        Vector3Int cityCenter = citySpawnManager.SpawnedCityCenters[enemyID];
+
+        // 타일 중앙 월드 좌표로 변환
+        Vector3 worldPos = tileMapManager.groundTilemap.GetCellCenterWorld(cityCenter);
+
+        // 영주성 초기화 (스프라이트 + 위치 + 체력)
+        lordCastle.Initialize(lordCastleSprite, worldPos, lordCastleMaxHP);
+
+        Debug.Log($"[EnemyOrigin] enemyID={enemyID}: 영주성을 {cityCenter} 위에 배치 완료.");
     }
 
     protected virtual void GameStartEnemyInfo()
@@ -57,10 +113,10 @@ public class EnemyOrigin : MonoBehaviour
     {
         actionCases.Clear();
 
-        actionCases.Add(new ActionCase { actionType = EnemyActionType.Attack, weight = 5 });
-        actionCases.Add(new ActionCase { actionType = EnemyActionType.Building, weight = 20 });
-        actionCases.Add(new ActionCase { actionType = EnemyActionType.GetGold, weight = 40 });
-        actionCases.Add(new ActionCase { actionType = EnemyActionType.GetHuman, weight = 35 });
+        actionCases.Add(new ActionCase { actionType = EnemyActionType.Attack,    weight = 5  });
+        actionCases.Add(new ActionCase { actionType = EnemyActionType.Building,  weight = 20 });
+        actionCases.Add(new ActionCase { actionType = EnemyActionType.GetGold,   weight = 40 });
+        actionCases.Add(new ActionCase { actionType = EnemyActionType.GetHuman,  weight = 35 });
     }
 
     //--------------------턴 시작과 종료----------------------
@@ -91,21 +147,10 @@ public class EnemyOrigin : MonoBehaviour
 
         switch (enemyAction)
         {
-            case EnemyActionType.Attack:
-                DoAttack();
-                break;
-
-            case EnemyActionType.Building:
-                DoBuilding();
-                break;
-
-            case EnemyActionType.GetGold:
-                DoGetGold();
-                break;
-
-            case EnemyActionType.GetHuman:
-                DoGetEnemyHuman();
-                break;
+            case EnemyActionType.Attack:   DoAttack();       break;
+            case EnemyActionType.Building: DoBuilding();     break;
+            case EnemyActionType.GetGold:  DoGetGold();      break;
+            case EnemyActionType.GetHuman: DoGetEnemyHuman();break;
         }
 
         EndEnemyTurn();
@@ -114,11 +159,8 @@ public class EnemyOrigin : MonoBehaviour
     protected virtual EnemyActionType GetWeightedRandomAction()
     {
         int totalWeight = 0;
-
         foreach (var actionCase in actionCases)
-        {
             totalWeight += actionCase.weight;
-        }
 
         if (totalWeight <= 0)
             return EnemyActionType.GetGold;
@@ -129,7 +171,6 @@ public class EnemyOrigin : MonoBehaviour
         foreach (var actionCase in actionCases)
         {
             currentWeight += actionCase.weight;
-
             if (randomValue < currentWeight)
                 return actionCase.actionType;
         }
@@ -183,10 +224,8 @@ public class EnemyOrigin : MonoBehaviour
 
         gold -= 10;
 
-        if(spawnPoint == null)
-        {
+        if (spawnPoint == null)
             spawnedEnemy.transform.position = transform.position;
-        }
         else
             spawnedEnemy.transform.position = spawnPoint.position;
 
@@ -195,11 +234,6 @@ public class EnemyOrigin : MonoBehaviour
         {
             enemyUnit.enemyType = enemyType;
             enemyUnit.enemyPool = enemyUnitPool;
-
-            // 직업은 여기서 따로 랜덤/설정 가능
-            // enemyUnit.job = Job.Farmer;
-            // enemyUnit.UnitAppear(); 
-            // ※ 이미 GetEnemyUnit에서 UnitAppear() 호출 중이면 여기선 다시 호출 안 해도 됨
         }
 
         Debug.Log($"<color=red>[유닛 소환]</color> {enemyType} 적 소환 완료 / 현재 골드: {gold}");
@@ -215,19 +249,11 @@ public class EnemyOrigin : MonoBehaviour
     {
         switch (action)
         {
-            case EnemyActionType.Attack:
-                return true;
-
-            case EnemyActionType.Building:
-                return gold >= 50;
-
-            case EnemyActionType.GetGold:
-                return true;
-
-            case EnemyActionType.GetHuman:
-                return gold >= 10;
+            case EnemyActionType.Attack:   return true;
+            case EnemyActionType.Building: return gold >= 50;
+            case EnemyActionType.GetGold:  return true;
+            case EnemyActionType.GetHuman: return gold >= 10;
         }
-
         return false;
     }
 }

@@ -294,12 +294,36 @@ public class TileMapManager : Singleton<TileMapManager>
         return allBuildings;
     }
 
+    // 외부에서 직접 생성한 BuildingInstance를 등록
+    // 영주성처럼 BuildingData 없이 코드로 생성하는 특수 건물에 사용
+    // FogManager 연동(OnBuildingPlaced)은 호출부에서 직접 처리
+    public void RegisterBuildingInstance(BuildingInstance instance)
+    {
+        if (instance == null) return;
+        allBuildings.Add(instance);
+        foreach (Vector3Int pos in instance.footprint)
+        {
+            buildingMap[pos] = instance.data; // data가 null이면 null 등록 (충돌 방지용)
+            buildingInstanceMap[pos] = instance;
+        }
+    }
+
     // ── 건물 배치 가능 여부 확인 ─────────────────────────────────
     // clickPos 기준으로 origin을 계산한 뒤 footprint 전체를 검사
     // 조건: 맵 안 + 강 없음 + 건물 없음 + allowedTiles 타입 일치
     public bool CanPlace(Vector3Int clickPos, BuildingData building)
     {
         Vector3Int origin = GetOrigin(clickPos, building);
+
+        // 버려진 영지 위 소규모 영지 배치 특수 케이스
+        // 점령 후 잔해 origin과 정확히 일치하면 allowedTiles 체크를 건너뜀
+        bool isRuinsPlacement = false;
+        if (building.buildingType == BuildingType.Outpost)
+        {
+            var ruins = AbandonedTerritoryManager.Instance;
+            if (ruins != null && ruins.CanPlaceOutpostHere(origin, 0))
+                isRuinsPlacement = true;
+        }
 
         for (int x = 0; x < building.width; x++)
         {
@@ -308,17 +332,20 @@ public class TileMapManager : Singleton<TileMapManager>
                 Vector3Int checkPos = origin + new Vector3Int(x, y, 0);
 
                 if (!IsValidPosition(checkPos)) return false;
-
                 if (riverTilemap != null && riverTilemap.HasTile(checkPos)) return false;
                 if (buildingMap.ContainsKey(checkPos)) return false;
 
-                TileType tileType = GetTileType(checkPos);
-                bool allowed = false;
-                foreach (TileType t in building.allowedTiles)
+                // 잔해 위 배치는 타일 타입 무관하게 허용 (Plain이 아닌 잔해 위에도 배치 가능)
+                if (!isRuinsPlacement)
                 {
-                    if (tileType == t) { allowed = true; break; }
+                    TileType tileType = GetTileType(checkPos);
+                    bool allowed = false;
+                    foreach (TileType t in building.allowedTiles)
+                    {
+                        if (tileType == t) { allowed = true; break; }
+                    }
+                    if (!allowed) return false;
                 }
-                if (!allowed) return false;
             }
         }
 
@@ -362,9 +389,16 @@ public class TileMapManager : Singleton<TileMapManager>
         // Outpost 배치 시: 8×8 City 타일 + 2칸 Farmland 테두리 생성
         if (building.buildingType == BuildingType.Outpost)
         {
+            // 버려진 영지 위 배치 여부 확인
+            var ruins = AbandonedTerritoryManager.Instance;
+            bool isRuinsPlacement = ruins != null && ruins.CanPlaceOutpostHere(origin, civID);
+
             ExpandOutpostArea(origin);
-            // 8×8 영역 시작점(origin -3, -3)부터 크기 8로 영구 시야 등록
             FogManager.Instance?.OnOutpostBuilt(new Vector3Int(origin.x - 3, origin.y - 3, 0), 8);
+
+            // 잔해 위라면 버려진 영지 완전 점령 처리 (외벽 설치 등)
+            if (isRuinsPlacement)
+                ruins.OnRuinsOutpostBuilt(civID);
         }
 
         FogManager.Instance?.OnBuildingPlaced(instance);

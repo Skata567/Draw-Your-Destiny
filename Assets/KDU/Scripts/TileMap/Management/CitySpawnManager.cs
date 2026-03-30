@@ -27,6 +27,10 @@ public class CitySpawnManager : MonoBehaviour
     // 외부에서 각 문명의 수도 위치를 참조할 때 사용
     private List<Vector3Int> spawnedCityCenters = new List<Vector3Int>();
     public List<Vector3Int> SpawnedCityCenters => spawnedCityCenters;
+    // 시작 도시 영역의 bounds 목록
+    // 영주성처럼 영역 중심 배치가 필요한 곳에서 사용
+    // 나중에 소규모 영지(예: 8x8)도 bounds만 넘기면 같은 계산을 재사용 가능
+    private List<BoundsInt> spawnedCityBounds = new List<BoundsInt>();
 
     private void Start()
     {
@@ -37,6 +41,9 @@ public class CitySpawnManager : MonoBehaviour
     private void InitializeCities()
     {
         // 1. BFS로 도시 타일을 연결된 영역 단위로 묶음 (20x20 → 1개 영역)
+        spawnedCityCenters.Clear();
+        spawnedCityBounds.Clear();
+
         List<List<Vector3Int>> cityRegions = FindCityRegions();
 
         if (cityRegions.Count < 4)
@@ -60,12 +67,27 @@ public class CitySpawnManager : MonoBehaviour
         {
             List<Vector3Int> region = cityRegions[selectedIdx[i]];
             Vector3Int center = GetCenter(region);
+            BoundsInt bounds = GetBounds(region);
             spawnedCityCenters.Add(center);
+            spawnedCityBounds.Add(bounds);
             SpawnCivilization(region, center, civID: i);
         }
     }
 
     // BFS로 연결된 city 타일 그룹 탐지
+    // 특정 문명의 시작 도시 bounds 반환
+    public bool TryGetSpawnedCityBounds(int civID, out BoundsInt bounds)
+    {
+        if (civID < 0 || civID >= spawnedCityBounds.Count)
+        {
+            bounds = default;
+            return false;
+        }
+
+        bounds = spawnedCityBounds[civID];
+        return true;
+    }
+
     private List<List<Vector3Int>> FindCityRegions()
     {
         Tilemap cityTilemap = tileMapManager.cityTilemap;
@@ -144,9 +166,34 @@ public class CitySpawnManager : MonoBehaviour
     // 영역의 평균 중심 좌표
     private Vector3Int GetCenter(List<Vector3Int> region)
     {
-        int sumX = 0, sumY = 0;
-        foreach (Vector3Int pos in region) { sumX += pos.x; sumY += pos.y; }
-        return new Vector3Int(sumX / region.Count, sumY / region.Count, 0);
+        BoundsInt bounds = GetBounds(region);
+
+        // 짝수 크기 영역은 중앙 2x2 중 좌하단 타일을 기준점으로 사용
+        int centerX = bounds.xMin + (bounds.size.x - 1) / 2;
+        int centerY = bounds.yMin + (bounds.size.y - 1) / 2;
+        return new Vector3Int(centerX, centerY, 0);
+    }
+
+    // 연결된 도시 영역의 최소/최대 범위를 bounds로 계산
+    private BoundsInt GetBounds(List<Vector3Int> region)
+    {
+        if (region == null || region.Count == 0)
+            return new BoundsInt();
+
+        int minX = region[0].x;
+        int maxX = region[0].x;
+        int minY = region[0].y;
+        int maxY = region[0].y;
+
+        foreach (Vector3Int pos in region)
+        {
+            if (pos.x < minX) minX = pos.x;
+            if (pos.x > maxX) maxX = pos.x;
+            if (pos.y < minY) minY = pos.y;
+            if (pos.y > maxY) maxY = pos.y;
+        }
+
+        return new BoundsInt(minX, minY, 0, maxX - minX + 1, maxY - minY + 1, 1);
     }
 
     // total개 중 count개 랜덤 비복원 추출
