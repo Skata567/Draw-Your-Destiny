@@ -35,19 +35,29 @@ public class EnemyOrigin : MonoBehaviour
     [SerializeField] protected EnemyUnitPool enemyUnitPool;
 
     [Header("각 건물들")]
-    [SerializeField] protected BuildingData houseData;
+    [SerializeField] protected BuildingData houseData; //집 데이터
+    [SerializeField] protected BuildingData outPostData; //소규모 영지용 데이터
+
+    [Header("소규모 영지 배치 설정")]
+    [SerializeField] protected int outpostCost = 100;
+    [SerializeField] protected int outpostMinDistanceFromGoldMine = 2;
+    [SerializeField] protected int outpostMaxDistanceFromGoldMine = 4;
+    [SerializeField] protected int outpostTryCount = 40;
 
     [Header("건물 배치 설정")]
     [SerializeField] protected int houseCost = 50;
-    [SerializeField] protected int minBuildRangeFromCastle = 2;
-    [SerializeField] protected int maxBuildRangeFromCastle = 6;
+    [SerializeField] protected int minBuildRangeFromCastle = 5;
+    [SerializeField] protected int maxBuildRangeFromCastle = 10;
     [SerializeField] protected int buildTryCount = 30;
+
 
     [Header("영주성")]
     [Tooltip("이 적의 영주성 스프라이트 — EnemyA/B/C Inspector에서 각각 설정")]
     public Sprite lordCastleSprite;
     [Tooltip("영주성 최대 체력")]
     public int lordCastleMaxHP = 100;
+
+
     // 같은 GameObject에 붙은 LordCastle 컴포넌트 (Start에서 자동으로 가져옴)
     protected LordCastle lordCastle;
 
@@ -135,7 +145,7 @@ public class EnemyOrigin : MonoBehaviour
     }
 
     //--------------------턴 시작과 종료----------------------
-    public virtual void StartEnemyTurn()
+    protected virtual void StartEnemyTurn()
     {
         Debug.Log("적 턴 시작");
         ExecuteRandomAction();
@@ -201,6 +211,14 @@ public class EnemyOrigin : MonoBehaviour
 
     protected virtual void DoBuilding()
     {
+        int randomValue = Random.Range(0, 100);
+
+        if (randomValue < 50)
+        {
+            BuildSmallTown();
+            return;
+        }
+
         if (houseData == null)
         {
             Debug.LogWarning("houseData가 연결되지 않았습니다.");
@@ -278,8 +296,8 @@ public class EnemyOrigin : MonoBehaviour
 
     protected virtual void DoGetGold()
     {
-        gold += 10;
-        Debug.Log($"<color=blue>[골드 얻음]</color> 현재 골드: {gold}");
+        gold += 100;
+        Debug.Log($"{enemyType}가 골드를 얻었어용. <color=green>현재 골드: {gold}</color>");
     }
 
     protected virtual void DoWait()
@@ -327,8 +345,75 @@ public class EnemyOrigin : MonoBehaviour
     }
 
     //-------------------특수 행동--------------------------------
+
+    //영지 기준으로 가까운 금광찾기
+    protected bool TryFindNearestGoldMine(out Vector3Int nearestGoldMineCell)
+    {
+        nearestGoldMineCell = Vector3Int.zero;
+
+        TileMapManager tileMapManager = TileMapManager.Instance;
+        if (tileMapManager == null || tileMapManager.groundTilemap == null)
+            return false;
+
+        List<Vector3Int> goldMineCells = tileMapManager.GetAllGoldMineCells();
+        if (goldMineCells == null || goldMineCells.Count == 0)
+            return false;
+
+        Vector3Int castleCell = tileMapManager.groundTilemap.WorldToCell(transform.position);
+
+        float minDist = float.MaxValue;
+        bool found = false;
+
+        foreach (Vector3Int goldCell in goldMineCells)
+        {
+            float dist = Vector3Int.Distance(castleCell, goldCell);
+
+            if (dist < minDist)
+            {
+                minDist = dist;
+                nearestGoldMineCell = goldCell;
+                found = true;
+            }
+        }
+
+        return found;
+    }
+
+    //금광 중심 설치 시도
+    protected bool TryFindOutpostPositionNearGoldMine(Vector3Int goldMineCell, out Vector3Int result)
+    {
+        result = goldMineCell;
+
+        TileMapManager tileMapManager = TileMapManager.Instance;
+        if (tileMapManager == null)
+            return false;
+
+        for (int i = 0; i < outpostTryCount; i++)
+        {
+            int offsetX = Random.Range(-outpostMaxDistanceFromGoldMine, outpostMaxDistanceFromGoldMine + 1);
+            int offsetY = Random.Range(-outpostMaxDistanceFromGoldMine, outpostMaxDistanceFromGoldMine + 1);
+
+            int manhattan = Mathf.Abs(offsetX) + Mathf.Abs(offsetY);
+
+            // 너무 가까운 건 제외, 너무 먼 것도 제외
+            if (manhattan < outpostMinDistanceFromGoldMine || manhattan > outpostMaxDistanceFromGoldMine)
+                continue;
+
+            Vector3Int candidate = goldMineCell + new Vector3Int(offsetX, offsetY, 0);
+
+            // 설치 가능 여부
+            if (!tileMapManager.CanPlace(candidate, outPostData))
+                continue;
+
+            result = candidate;
+            return true;
+        }
+
+        return false;
+    }
     protected virtual void BuildSmallTown()
     {
+
     }
 
     //----------------행동검사------------------
