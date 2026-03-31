@@ -10,7 +10,7 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: b0a6ecf4228e0d840954ac52207e8d40, type: 3}
-  m_Name: Building_
+  m_Name: OutPostCity
   m_EditorClassIdentifier: 
   buildingName: "\uC801\uC758 \uC9D1"
   buildingType: 1

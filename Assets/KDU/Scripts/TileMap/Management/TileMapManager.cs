@@ -714,4 +714,23 @@ public class TileMapManager : Singleton<TileMapManager>
         // 플레이어용 GameManager 자원 처리 없음
         return true;
     }
+
+    //---------------------------금광타일 찾는거임 건들 ㄴㄴㄴㄴㄴㄴ-----------------------
+    public List<Vector3Int> GetAllGoldMineCells()
+    {
+        List<Vector3Int> result = new List<Vector3Int>();
+
+        if (goldMineTilemap == null)
+            return result;
+
+        BoundsInt bounds = goldMineTilemap.cellBounds;
+
+        foreach (Vector3Int pos in bounds.allPositionsWithin)
+        {
+            if (goldMineTilemap.HasTile(pos))
+                result.Add(pos);
+        }
+
+        return result;
+    }
 }
