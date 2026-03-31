@@ -2160,10 +2160,12 @@ MonoBehaviour:
   currentTurn: 0
   playerGold: 10
   playerResearch: 0
+  Food: 0
   playerPopulation: 0
   playerPopulationCap: 10
   endTurn: 0
   startTurn: 0
+  playerEra: 0
   humanGenPoints:
   - {fileID: 2137749446}
   - {fileID: 1964235394}

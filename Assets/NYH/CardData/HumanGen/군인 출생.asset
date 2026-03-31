@@ -12,14 +12,15 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f6721149ab5281e49ad6efb81178335b, type: 3}
   m_Name: "\uAD70\uC778 \uCD9C\uC0DD"
   m_EditorClassIdentifier: 
-  description: "\uC190\uD328\uC758 \uCF54\uC2A4\uD2B8\uB97C 0\uC73C\uB85C \uBCC0\uACBD"
-  <Cost>k__BackingField: 0
+  <cardID>k__BackingField: 1003
+  cardName: "\uAD70\uC778 \uCD9C\uC0DD"
+  <cardType>k__BackingField: 5
   <Image>k__BackingField: {fileID: 21300000, guid: e15a0aaf619d8aa429bd091186fb29a2,
     type: 3}
+  <Cost>k__BackingField: 1
+  description: "\uAD70\uC778 5\uBA85\uC774 \uD0DC\uC5B4\uB0A9\uB2C8\uB2E4."
   <Effects>k__BackingField:
   - rid: 2172718143113527374
-  <cardID>k__BackingField: 22
-  <cardType>k__BackingField: 0
   references:
     version: 2
     RefIds:

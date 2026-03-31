@@ -59,6 +59,7 @@ public class HumanUnit : MonoBehaviour
                 break;
             case Job.Soldier:
                 koreanArmy = true;
+                gender = Gender.Male; //군인은 남자만 나옴
                 break;
             case Job.Miner:
                 koreanArmy = false;
