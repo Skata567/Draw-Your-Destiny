@@ -66,6 +66,58 @@
         }
 
         /// <summary>
+        /// 카탈로그에서 랜덤 카드 N장을 보여주고, 선택한 카드 1장을 덱에 추가한 뒤 셔플합니다.
+        /// </summary>
+        public IEnumerator OfferRandomCatalogCardToDeck(int amount)
+        {
+            if (CardCatalog.Instance == null)
+            {
+                Debug.LogWarning("[CardSystem] CardCatalog가 없어 카드 선택을 건너뜁니다.");
+                yield break;
+            }
+
+            if (CardSelectionUI.Instance == null)
+            {
+                Debug.LogWarning("[CardSystem] CardSelectionUI가 없어 카드 선택을 건너뜁니다.");
+                yield break;
+            }
+
+            List<CardData> candidateData = CardCatalog.Instance.GetRandom(amount);
+            if (candidateData == null || candidateData.Count == 0)
+            {
+                Debug.LogWarning("[CardSystem] 선택할 카드 후보가 없습니다.");
+                yield break;
+            }
+
+            List<Card> previewCards = new();
+            foreach (var data in candidateData)
+            {
+                if (data != null) previewCards.Add(new Card(data));
+            }
+
+            if (previewCards.Count == 0) yield break;
+
+            Card selectedCard = null;
+            bool isChosen = false;
+
+            CardSelectionUI.Instance.Show(previewCards, card =>
+            {
+                selectedCard = card;
+                isChosen = true;
+            });
+
+            yield return new WaitUntil(() => isChosen);
+
+            if (selectedCard?.data == null) yield break;
+
+            drawPile.Add(new Card(selectedCard.data));
+            drawPile.Shuffle();
+            deackCount.text = $"{drawPile.Count}장";
+
+            Debug.Log($"[CardSystem] 선택 카드 덱 추가 및 셔플: {selectedCard.Title}");
+        }
+
+        /// <summary>
         /// ActionSystem에서 전달받은 모든 액션을 여기서 분기하여 처리합니다.
         /// </summary>
         public IEnumerator Perform(GameAction action)

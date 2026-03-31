@@ -1390,7 +1390,7 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 0}
+      - m_Target: {fileID: 1698640418}
         m_TargetAssemblyTypeName: NYH.CoreCardSystem.CardSystem, Assembly-CSharp
         m_MethodName: ShowGraveyard
         m_Mode: 1
@@ -1656,7 +1656,7 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 0}
+      - m_Target: {fileID: 1698640418}
         m_TargetAssemblyTypeName: NYH.CoreCardSystem.CardSystem, Assembly-CSharp
         m_MethodName: ShowDeck
         m_Mode: 1
@@ -2012,12 +2012,15 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   currentTurn: 0
-  playerGold: 10
+  playerGold: 500
   playerResearch: 0
+  Food: 0
   playerPopulation: 0
   playerPopulationCap: 10
   endTurn: 0
   startTurn: 0
+  playerEra: 0
+  humanGenPoints: []
 --- !u!4 &1169971045
 Transform:
   m_ObjectHideFlags: 0
@@ -3733,6 +3736,7 @@ GameObject:
   - component: {fileID: 1698640414}
   - component: {fileID: 1698640415}
   - component: {fileID: 1698640416}
+  - component: {fileID: 1698640419}
   - component: {fileID: 1698640417}
   m_Layer: 0
   m_Name: CardManager
@@ -3797,13 +3801,14 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   myDeck:
-  - {fileID: 11400000, guid: f8b9bb2a07fc2d94aaab3bc8b536bab9, type: 2}
-  - {fileID: 11400000, guid: f8b9bb2a07fc2d94aaab3bc8b536bab9, type: 2}
-  - {fileID: 11400000, guid: f8b9bb2a07fc2d94aaab3bc8b536bab9, type: 2}
-  - {fileID: 11400000, guid: f8b9bb2a07fc2d94aaab3bc8b536bab9, type: 2}
-  - {fileID: 11400000, guid: f8b9bb2a07fc2d94aaab3bc8b536bab9, type: 2}
-  - {fileID: 11400000, guid: f8b9bb2a07fc2d94aaab3bc8b536bab9, type: 2}
-  - {fileID: 11400000, guid: f8b9bb2a07fc2d94aaab3bc8b536bab9, type: 2}
+  - {fileID: 11400000, guid: 47c78423e4782384197072e886611112, type: 2}
+  - {fileID: 11400000, guid: 47c78423e4782384197072e886611112, type: 2}
+  - {fileID: 11400000, guid: 47c78423e4782384197072e886611112, type: 2}
+  - {fileID: 11400000, guid: 47c78423e4782384197072e886611112, type: 2}
+  - {fileID: 11400000, guid: 47c78423e4782384197072e886611112, type: 2}
+  - {fileID: 11400000, guid: 47c78423e4782384197072e886611112, type: 2}
+  - {fileID: 11400000, guid: 47c78423e4782384197072e886611112, type: 2}
+  - {fileID: 11400000, guid: 47c78423e4782384197072e886611112, type: 2}
   gameManager: {fileID: 1169971044}
 --- !u!114 &1698640415
 MonoBehaviour:
@@ -3862,6 +3867,26 @@ MonoBehaviour:
   discardPilePoint: {fileID: 318577942}
   deackCount: {fileID: 1176276858}
   discardCount: {fileID: 2044909670}
+--- !u!114 &1698640419
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1698640409}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c13c877e73db10b4fb71603d5791c8dc, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  allCards:
+  - {fileID: 11400000, guid: 47c78423e4782384197072e886611112, type: 2}
+  - {fileID: 11400000, guid: 805296239e6bc4540b0005cacbf6c299, type: 2}
+  - {fileID: 11400000, guid: 847f7dc08e9b60d409a3e0f747c74de1, type: 2}
+  - {fileID: 11400000, guid: 4487b2f43f2b42a4ebf2514158dac2dd, type: 2}
+  - {fileID: 11400000, guid: 79b4ec058cacc58438f7b8f2649b38de, type: 2}
+  panel: {fileID: 1415796183}
+  container: {fileID: 1415796184}
 --- !u!1 &1731127173
 GameObject:
   m_ObjectHideFlags: 0

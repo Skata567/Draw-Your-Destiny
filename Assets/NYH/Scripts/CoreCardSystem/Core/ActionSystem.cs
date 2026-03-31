@@ -50,7 +50,7 @@
 
             // 2단계: PERFORM
             currentReactions = action.PerformReactions;
-            yield return PerformPerformer(action);
+            yield return     PerformPerformer(action);
             yield return PerformReactions(action.PerformReactions);
 
             // 3단계: POST

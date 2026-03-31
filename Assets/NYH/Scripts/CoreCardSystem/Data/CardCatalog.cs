@@ -21,6 +21,11 @@
         [Header("전체 카드 목록 (인스펙터에서 CardData SO 등록)")]
         [SerializeField] private List<CardData> allCards = new();
 
+        [Header("선택 카드 띄울 판넬")]
+        [SerializeField] private GameObject panel;
+        [SerializeField] private Transform container;
+
+
         // cardID → CardData 빠른 조회용 딕셔너리 (Awake에서 빌드)
         private Dictionary<int, CardData> idMap = new();
 

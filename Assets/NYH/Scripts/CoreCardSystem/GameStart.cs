@@ -48,9 +48,21 @@ public class GameStarter : MonoBehaviour
 
     private void StartTurnCard()
     {
-        Debug.Log("턴 시작: 카드를 5장 뽑습니다.");
+        if (gameManager != null) gameManager.startTurn = false; // 플래그 리셋
+        StartCoroutine(StartTurnCardRoutine());
+    }
+
+    private IEnumerator StartTurnCardRoutine()
+    {
+        //카드 선택
+        Debug.Log("턴 시작: 카드 3장 중 1장을 덱에 추가한 뒤 5장을 뽑습니다.");
+
+        if (CardSystem.Instance != null)
+        {
+            yield return CardSystem.Instance.OfferRandomCatalogCardToDeck(3);
+        }
+
         ActionSystem.Instance.Perform(new DrawCardsGA(5));
-        if(gameManager != null) gameManager.startTurn = false; // 플래그 리셋
     }
 
     void Update()

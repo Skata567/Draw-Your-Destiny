@@ -50,7 +50,7 @@ public class BuildingPlacementController : MonoBehaviour
         Vector3Int tilePos = placementService.GetMouseTilePos();
         placementService.UpdatePreview(tilePos);
 
-        // 이거 키면 카드에서 배치할때 뺏겨서 마우스 클릭 배치 안됨
+        // 이거 키면 카드에서 배치할때 뺏겨서 마우스 클릭 배치
         // if (Input.GetMouseButtonDown(0))
         // {
         //     placementService.TryPlaceBuilding(tilePos);

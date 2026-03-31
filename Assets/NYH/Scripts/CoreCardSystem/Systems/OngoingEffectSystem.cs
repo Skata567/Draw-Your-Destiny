@@ -34,8 +34,6 @@ public class OngoingEffectSystem : Singleton<OngoingEffectSystem>
                 {
                     var effect = entry.SourceCard.Effects[j];
 
-                    // AddReaction 대신 Perform을 사용해 보세요.
-                    // 이렇게 하면 매 효과마다 ActionSystem 엔진이 체크하고 실행합니다.
                     ActionSystem.Instance.Perform(new PerformEffectGA(entry.SourceCard, effect, j));
                 }
             }
