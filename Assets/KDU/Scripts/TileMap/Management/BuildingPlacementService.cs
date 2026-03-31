@@ -50,7 +50,15 @@ public class BuildingPlacementService : MonoBehaviour
     }
 
     // ── 배치 모드 시작 ────────────────────────────────────────
-    // 카드 사용 또는 GameManager.StartBuildingPlacement()에서 호출
+    // [호출 방법 — NYH(카드 시스템) 참고]
+    // 카드 클릭 시 CardView → BuildingPlacementService.StartPlacing(buildingData) 를 호출.
+    // 이후 플레이어가 타일을 클릭하면 CardSystem.TryQueuePlacementCard()가 실행되어
+    // TileMapManager.PlaceBuilding()까지 자동으로 이어진다.
+    //
+    // [소규모 영지 카드의 경우]
+    // buildingData.buildingType == BuildingType.Outpost 이면
+    // PlaceBuilding 내부에서 8×8 City 생성 + 영주성 자동 배치까지 모두 처리됨.
+    // 이 함수를 호출하는 쪽에서 따로 ExpandOutpostArea 등을 부를 필요 없음.
     public void StartPlacing(BuildingData data)
     {
         if (data == null || tileMapManager == null) return;
@@ -91,11 +99,13 @@ public class BuildingPlacementService : MonoBehaviour
 
         // 기준점(origin) 계산 → 건물 중심 월드 좌표 계산
         Vector3Int origin = tileMapManager.GetOrigin(tilePos, currentBuilding);
-        float centerX = origin.x + (currentBuilding.width  - 1) * 0.5f;
-        float centerY = origin.y + (currentBuilding.height - 1) * 0.5f;
-        Vector3 worldPos = tileMapManager.groundTilemap.CellToWorld(
-            new Vector3Int(Mathf.RoundToInt(centerX), Mathf.RoundToInt(centerY), 0));
-        worldPos += tileMapManager.groundTilemap.cellSize * 0.5f; // 타일 중심으로 보정
+        Vector3 cellSize = tileMapManager.groundTilemap.cellSize;
+        Vector3 originWorld = tileMapManager.groundTilemap.CellToWorld(origin);
+        // origin 좌하단 월드 좌표 + 건물 전체 크기의 절반 = 정확한 시각 중심
+        Vector3 worldPos = originWorld + new Vector3(
+            currentBuilding.width  * cellSize.x * 0.5f,
+            currentBuilding.height * cellSize.y * 0.5f,
+            0f);
 
         // 타일 좌표가 바뀔 때만 CanPlace 재계산 (캐싱)
         bool canPlace;
