@@ -79,8 +79,47 @@ public class HumanUnit : MonoBehaviour
         {
             Dead();
         }
+        TryRandomStepMove();
     }
 
+    //------------------유닛 한칸씩 움직이는거임-----------------------------
+    private void TryRandomStepMove()
+    {
+        Vector3Int currentCell = TileMapManager.Instance.groundTilemap.WorldToCell(transform.position);
+
+        Vector3Int[] directions =
+        {
+        new Vector3Int(1, 0, 0),
+        new Vector3Int(-1, 0, 0),
+        new Vector3Int(0, 1, 0),
+        new Vector3Int(0, -1, 0),
+        new Vector3Int(1, 1, 0),
+        new Vector3Int(-1, -1, 0),
+        new Vector3Int(1, -1, 0),
+        new Vector3Int(-1, 1, 0)
+    };
+
+        List<Vector3Int> possibleMoves = new List<Vector3Int>();
+
+        foreach (var dir in directions)
+        {
+            Vector3Int nextCell = currentCell + dir;
+
+            if (!TileMapManager.Instance.IsWalkableTerritory(nextCell))
+                continue;
+
+            possibleMoves.Add(nextCell);
+        }
+
+        if (possibleMoves.Count == 0)
+            return;
+
+        Vector3Int randomTarget = possibleMoves[Random.Range(0, possibleMoves.Count)];
+
+        currentPath = new List<Vector3Int> { randomTarget };
+        pathIndex = 0;
+        isMoving = true;
+    }
     void CheckCardUsing()//카드 사용했을때 행동들 체크.
     {
 

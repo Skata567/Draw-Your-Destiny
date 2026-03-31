@@ -34,12 +34,20 @@ public class EnemyOrigin : MonoBehaviour
     [SerializeField] protected int enemyID;
     [SerializeField] protected EnemyUnitPool enemyUnitPool;
 
+    [Header("각 건물들")]
+    [SerializeField] protected BuildingData houseData;
+
+    [Header("건물 배치 설정")]
+    [SerializeField] protected int houseCost = 50;
+    [SerializeField] protected int minBuildRangeFromCastle = 2;
+    [SerializeField] protected int maxBuildRangeFromCastle = 6;
+    [SerializeField] protected int buildTryCount = 30;
+
     [Header("영주성")]
     [Tooltip("이 적의 영주성 스프라이트 — EnemyA/B/C Inspector에서 각각 설정")]
     public Sprite lordCastleSprite;
     [Tooltip("영주성 최대 체력")]
     public int lordCastleMaxHP = 100;
-
     // 같은 GameObject에 붙은 LordCastle 컴포넌트 (Start에서 자동으로 가져옴)
     protected LordCastle lordCastle;
 
@@ -56,6 +64,13 @@ public class EnemyOrigin : MonoBehaviour
         // CitySpawnManager가 DefaultExecutionOrder(10)으로 나중에 실행되므로
         // 한 프레임 후에 영주성 위치를 잡아야 도시 중심 좌표가 확정됨
         StartCoroutine(InitLordCastleNextFrame());
+    }
+    protected virtual void Update()
+    {
+        if (Input.GetKeyDown(KeyCode.E))
+        {
+            StartEnemyTurn();
+        }
     }
 
     // 영주성 위치 + 스프라이트 초기화 (1프레임 대기 후 실행)
@@ -113,10 +128,10 @@ public class EnemyOrigin : MonoBehaviour
     {
         actionCases.Clear();
 
-        actionCases.Add(new ActionCase { actionType = EnemyActionType.Attack,    weight = 5  });
-        actionCases.Add(new ActionCase { actionType = EnemyActionType.Building,  weight = 20 });
-        actionCases.Add(new ActionCase { actionType = EnemyActionType.GetGold,   weight = 40 });
-        actionCases.Add(new ActionCase { actionType = EnemyActionType.GetHuman,  weight = 35 });
+        actionCases.Add(new ActionCase { actionType = EnemyActionType.Attack, weight = 5 });
+        actionCases.Add(new ActionCase { actionType = EnemyActionType.Building, weight = 20 });
+        actionCases.Add(new ActionCase { actionType = EnemyActionType.GetGold, weight = 40 });
+        actionCases.Add(new ActionCase { actionType = EnemyActionType.GetHuman, weight = 35 });
     }
 
     //--------------------턴 시작과 종료----------------------
@@ -147,10 +162,10 @@ public class EnemyOrigin : MonoBehaviour
 
         switch (enemyAction)
         {
-            case EnemyActionType.Attack:   DoAttack();       break;
-            case EnemyActionType.Building: DoBuilding();     break;
-            case EnemyActionType.GetGold:  DoGetGold();      break;
-            case EnemyActionType.GetHuman: DoGetEnemyHuman();break;
+            case EnemyActionType.Attack: DoAttack(); break;
+            case EnemyActionType.Building: DoBuilding(); break;
+            case EnemyActionType.GetGold: DoGetGold(); break;
+            case EnemyActionType.GetHuman: DoGetEnemyHuman(); break;
         }
 
         EndEnemyTurn();
@@ -186,8 +201,80 @@ public class EnemyOrigin : MonoBehaviour
 
     protected virtual void DoBuilding()
     {
-        Debug.Log("적이 건물을 짓는다람쥐");
+        if (houseData == null)
+        {
+            Debug.LogWarning("houseData가 연결되지 않았습니다.");
+            return;
+        }
+
+        if (gold < houseCost)
+        {
+            Debug.LogWarning($"집 건설 골드 부족. 현재 골드: {gold}");
+            return;
+        }
+
+        TileMapManager tileMapManager = TileMapManager.Instance;
+        if (tileMapManager == null || tileMapManager.groundTilemap == null)
+        {
+            Debug.LogWarning("TileMapManager 또는 groundTilemap이 없습니다.");
+            return;
+        }
+
+        Vector3Int castleCell = tileMapManager.groundTilemap.WorldToCell(transform.position);
+
+        if (TryFindBuildPositionNearCastle(castleCell, out Vector3Int buildPos))
+        {
+            bool success = tileMapManager.PlaceBuildingForAI(buildPos, houseData, enemyID);
+
+            if (success)
+            {
+                gold -= houseCost;
+                Debug.Log($"<color=green>[건물 건설]</color> {enemyType}가 {buildPos} 에 집을 설치했습니다. 현재 골드: {gold}");
+            }
+            else
+            {
+                Debug.LogWarning("건설 위치를 찾았지만 실제 배치에는 실패했습니다.");
+            }
+        }
+        else
+        {
+            Debug.Log("영주성 주변에 집을 지을 수 있는 위치를 찾지 못했습니다.");
+        }
     }
+
+    protected bool TryFindBuildPositionNearCastle(Vector3Int castleCell, out Vector3Int result)
+    {
+        TileMapManager tileMapManager = TileMapManager.Instance;
+        result = castleCell;
+
+        for (int i = 0; i < buildTryCount; i++)
+        {
+            int offsetX = Random.Range(-maxBuildRangeFromCastle, maxBuildRangeFromCastle + 1);
+            int offsetY = Random.Range(-maxBuildRangeFromCastle, maxBuildRangeFromCastle + 1);
+
+            // 너무 가까운 칸은 제외
+            if (Mathf.Abs(offsetX) < minBuildRangeFromCastle &&
+                Mathf.Abs(offsetY) < minBuildRangeFromCastle)
+            {
+                continue;
+            }
+
+            Vector3Int candidate = castleCell + new Vector3Int(offsetX, offsetY, 0);
+
+            // 자기 영토 위만 짓고 싶으면 이 조건 추가
+            if (tileMapManager.GetOwner(candidate) != enemyID)
+                continue;
+
+            if (tileMapManager.CanPlace(candidate, houseData))
+            {
+                result = candidate;
+                return true;
+            }
+        }
+
+        return false;
+    }
+
 
     protected virtual void DoGetGold()
     {
@@ -249,9 +336,9 @@ public class EnemyOrigin : MonoBehaviour
     {
         switch (action)
         {
-            case EnemyActionType.Attack:   return true;
+            case EnemyActionType.Attack: return true;
             case EnemyActionType.Building: return gold >= 50;
-            case EnemyActionType.GetGold:  return true;
+            case EnemyActionType.GetGold: return true;
             case EnemyActionType.GetHuman: return gold >= 10;
         }
         return false;

@@ -15,7 +15,10 @@ public class EnemyA : EnemyOrigin
         Debug.Log("적 A의 행동 실행");
     }
 
-
+    protected override void DoBuilding()
+    {
+        base.DoBuilding();
+    }
     // 적 A는 더 많은 인간을 뽑는다고 가정
     //protected override void DoGetEnemyHuman()
     //{

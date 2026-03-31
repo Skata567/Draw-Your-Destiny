@@ -649,4 +649,69 @@ public class TileMapManager : Singleton<TileMapManager>
         farmlandTilemap.SetTileFlags(pos, TileFlags.None);
         tileDataMap[pos].type = TileType.Farmland;
     }
+
+    //----------------------------적 전용 건물 설치하는거임 건들 ㄴㄴㄴㄴㄴ-------------------------------------------------
+    public bool PlaceBuildingForAI(Vector3Int clickPos, BuildingData building, int civID)
+    {
+        if (building == null)
+        {
+            Debug.LogWarning("building이 null임.");
+            return false;
+        }
+
+        if (!CanPlace(clickPos, building))
+        {
+            return false;
+        }
+
+        Vector3Int origin = GetOrigin(clickPos, building);
+        List<Vector3Int> footprint = new List<Vector3Int>();
+
+        for (int x = 0; x < building.width; x++)
+        {
+            for (int y = 0; y < building.height; y++)
+            {
+                Vector3Int pos = origin + new Vector3Int(x, y, 0);
+                buildingMap[pos] = building;
+                footprint.Add(pos);
+            }
+        }
+
+        GameObject visual = CreateBuildingVisual(origin, building);
+
+        BuildingInstance instance = new BuildingInstance
+        {
+            data = building,
+            origin = origin,
+            footprint = footprint,
+            ownerCivID = civID,
+            wasEverSeen = true, // AI 건물은 처음엔 플레이어 시야 기준 미확인 처리 가능 일단 테스트 용으로 true로 했음
+            visual = visual
+        };
+
+        allBuildings.Add(instance);
+
+        foreach (Vector3Int pos in footprint)
+        {
+            buildingInstanceMap[pos] = instance;
+        }
+
+        // Outpost 특수 처리도 동일하게 유지
+        if (building.buildingType == BuildingType.Outpost)
+        {
+            var ruins = AbandonedTerritoryManager.Instance;
+            bool isRuinsPlacement = ruins != null && ruins.CanPlaceOutpostHere(origin, civID);
+
+            ExpandOutpostArea(origin);
+            FogManager.Instance?.OnOutpostBuilt(new Vector3Int(origin.x - 3, origin.y - 3, 0), 8);
+
+            if (isRuinsPlacement)
+                ruins.OnRuinsOutpostBuilt(civID);
+        }
+
+        FogManager.Instance?.OnBuildingPlaced(instance);
+
+        // 플레이어용 GameManager 자원 처리 없음
+        return true;
+    }
 }
