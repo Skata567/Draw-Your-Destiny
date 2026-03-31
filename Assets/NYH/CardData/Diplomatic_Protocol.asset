@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: Diplomatic_Protocol
   m_EditorClassIdentifier: 
   <cardID>k__BackingField: 3111
-  cardName: 
+  cardName: "\uC678\uAD50 \uAD00\uB840"
   <cardType>k__BackingField: 4
   <Image>k__BackingField: {fileID: 0}
   <Cost>k__BackingField: 2

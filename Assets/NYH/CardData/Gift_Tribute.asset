@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: Gift_Tribute
   m_EditorClassIdentifier: 
   <cardID>k__BackingField: 3110
-  cardName: 
+  cardName: "\uC120\uBB3C \uACF5\uC778"
   <cardType>k__BackingField: 4
   <Image>k__BackingField: {fileID: 0}
   <Cost>k__BackingField: 5

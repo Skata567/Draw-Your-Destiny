@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: Weapons_Lab
   m_EditorClassIdentifier: 
   <cardID>k__BackingField: 4005
-  cardName: 
+  cardName: "\uBCD1\uAE30 \uC5F0\uAD6C\uC18C"
   <cardType>k__BackingField: 3
   <Image>k__BackingField: {fileID: 0}
   <Cost>k__BackingField: 3

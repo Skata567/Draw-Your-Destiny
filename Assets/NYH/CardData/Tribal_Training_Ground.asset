@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: Tribal_Training_Ground
   m_EditorClassIdentifier: 
   <cardID>k__BackingField: 1102
-  cardName: 
+  cardName: "\uBD80\uC871 \uD6C8\uB828\uC9C0 \uAC74\uC124"
   <cardType>k__BackingField: 5
   <Image>k__BackingField: {fileID: 0}
   <Cost>k__BackingField: 3

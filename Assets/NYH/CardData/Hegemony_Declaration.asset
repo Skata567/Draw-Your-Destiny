@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: Hegemony_Declaration
   m_EditorClassIdentifier: 
   <cardID>k__BackingField: 3107
-  cardName: 
+  cardName: "\uD328\uAD8C\uC758 \uC120\uC5B8"
   <cardType>k__BackingField: 4
   <Image>k__BackingField: {fileID: 0}
   <Cost>k__BackingField: 3

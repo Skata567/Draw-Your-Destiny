@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: Trade_Route
   m_EditorClassIdentifier: 
   <cardID>k__BackingField: 3109
-  cardName: 
+  cardName: "\uAD6D\uC5ED\uB85C"
   <cardType>k__BackingField: 4
   <Image>k__BackingField: {fileID: 0}
   <Cost>k__BackingField: 3

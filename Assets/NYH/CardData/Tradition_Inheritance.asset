@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: Tradition_Inheritance
   m_EditorClassIdentifier: 
   <cardID>k__BackingField: 3108
-  cardName: 
+  cardName: "\uC804\uD1B5\uC758 \uACC4\uCE59"
   <cardType>k__BackingField: 4
   <Image>k__BackingField: {fileID: 0}
   <Cost>k__BackingField: 2

@@ -22,12 +22,13 @@ public class CardDataGenerator : EditorWindow
             CardData existing = AssetDatabase.LoadAssetAtPath<CardData>(assetPath);
             CardData asset = existing != null ? existing : ScriptableObject.CreateInstance<CardData>();
 
-            asset.name = entry.koreanName;
+            asset.name = entry.fileName;
 
             SerializedObject so = new SerializedObject(asset);
-            so.FindProperty("<cardID>k__BackingField").intValue       = entry.cardID;
+            so.FindProperty("<cardID>k__BackingField").intValue         = entry.cardID;
             so.FindProperty("<Cost>k__BackingField").intValue         = entry.cost;
             so.FindProperty("<cardType>k__BackingField").enumValueIndex = (int)entry.cardType;
+            so.FindProperty("cardName").stringValue                   = entry.koreanName;
             so.FindProperty("description").stringValue               = entry.description;
             so.ApplyModifiedPropertiesWithoutUndo();
 

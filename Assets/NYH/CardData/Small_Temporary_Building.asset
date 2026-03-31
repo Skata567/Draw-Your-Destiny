@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: Small_Temporary_Building
   m_EditorClassIdentifier: 
   <cardID>k__BackingField: 1006
-  cardName: 
+  cardName: "\uC18C\uADDC\uBAA8 \uC784\uC2DC \uAC74\uC124"
   <cardType>k__BackingField: 5
   <Image>k__BackingField: {fileID: 0}
   <Cost>k__BackingField: 10

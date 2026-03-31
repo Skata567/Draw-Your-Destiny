@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: Two_Story_House
   m_EditorClassIdentifier: 
   <cardID>k__BackingField: 4001
-  cardName: 
+  cardName: "\uC774\uAC00\uC9D1 \uAC74\uC124"
   <cardType>k__BackingField: 5
   <Image>k__BackingField: {fileID: 0}
   <Cost>k__BackingField: 3

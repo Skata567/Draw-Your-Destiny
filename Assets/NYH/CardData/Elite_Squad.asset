@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: Elite_Squad
   m_EditorClassIdentifier: 
   <cardID>k__BackingField: 2202
-  cardName: 
+  cardName: "\uC815\uC608 \uBD80\uB300"
   <cardType>k__BackingField: 1
   <Image>k__BackingField: {fileID: 0}
   <Cost>k__BackingField: 3

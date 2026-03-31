@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: Theory_Establishment
   m_EditorClassIdentifier: 
   <cardID>k__BackingField: 2207
-  cardName: 
+  cardName: "\uC774\uB860 \uC815\uB9BD"
   <cardType>k__BackingField: 3
   <Image>k__BackingField: {fileID: 0}
   <Cost>k__BackingField: 1

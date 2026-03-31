@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: Merchant_Street
   m_EditorClassIdentifier: 
   <cardID>k__BackingField: 3003
-  cardName: 
+  cardName: "\uC0C1\uC778 \uAC70\uB9AC"
   <cardType>k__BackingField: 5
   <Image>k__BackingField: {fileID: 0}
   <Cost>k__BackingField: 2

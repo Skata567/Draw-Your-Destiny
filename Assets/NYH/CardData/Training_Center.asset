@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: Training_Center
   m_EditorClassIdentifier: 
   <cardID>k__BackingField: 3002
-  cardName: 
+  cardName: "\uD6C8\uB828\uC18C \uAC74\uC124"
   <cardType>k__BackingField: 5
   <Image>k__BackingField: {fileID: 0}
   <Cost>k__BackingField: 3

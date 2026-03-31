@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: Tent_Construction
   m_EditorClassIdentifier: 
   <cardID>k__BackingField: 1101
-  cardName: 
+  cardName: "\uC784\uB9C9 \uAC74\uC124"
   <cardType>k__BackingField: 5
   <Image>k__BackingField: {fileID: 0}
   <Cost>k__BackingField: 3

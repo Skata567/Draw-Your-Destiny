@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: Expedition
   m_EditorClassIdentifier: 
   <cardID>k__BackingField: 1007
-  cardName: 
+  cardName: "\uC6D0\uC815"
   <cardType>k__BackingField: 5
   <Image>k__BackingField: {fileID: 0}
   <Cost>k__BackingField: 1

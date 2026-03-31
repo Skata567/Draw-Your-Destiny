@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: Iron_Armament
   m_EditorClassIdentifier: 
   <cardID>k__BackingField: 4004
-  cardName: 
+  cardName: "\uCCA0\uACC4 \uC804\uC758"
   <cardType>k__BackingField: 1
   <Image>k__BackingField: {fileID: 0}
   <Cost>k__BackingField: 6

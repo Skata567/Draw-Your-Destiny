@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: Military_Building
   m_EditorClassIdentifier: 
   <cardID>k__BackingField: 4002
-  cardName: 
+  cardName: "\uBCD1\uC0AC \uAC74\uBB3C \uAC74\uC124"
   <cardType>k__BackingField: 5
   <Image>k__BackingField: {fileID: 0}
   <Cost>k__BackingField: 3

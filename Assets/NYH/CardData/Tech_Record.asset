@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: Tech_Record
   m_EditorClassIdentifier: 
   <cardID>k__BackingField: 2210
-  cardName: 
+  cardName: "\uAE30\uC220 \uAE30\uB85D"
   <cardType>k__BackingField: 3
   <Image>k__BackingField: {fileID: 0}
   <Cost>k__BackingField: 1

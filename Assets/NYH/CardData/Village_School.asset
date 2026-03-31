@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: Village_School
   m_EditorClassIdentifier: 
   <cardID>k__BackingField: 9002
-  cardName: 
+  cardName: "\uC11C\uB2F9"
   <cardType>k__BackingField: 5
   <Image>k__BackingField: {fileID: 0}
   <Cost>k__BackingField: 3

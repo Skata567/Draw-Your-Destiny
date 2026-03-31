@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: Enlightenment
   m_EditorClassIdentifier: 
   <cardID>k__BackingField: 4006
-  cardName: 
+  cardName: "\uACC4\uC2DC"
   <cardType>k__BackingField: 3
   <Image>k__BackingField: {fileID: 0}
   <Cost>k__BackingField: 2

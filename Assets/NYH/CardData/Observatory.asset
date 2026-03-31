@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: Observatory
   m_EditorClassIdentifier: 
   <cardID>k__BackingField: 2209
-  cardName: 
+  cardName: "\uAD00\uCE21\uC18C"
   <cardType>k__BackingField: 3
   <Image>k__BackingField: {fileID: 0}
   <Cost>k__BackingField: 2

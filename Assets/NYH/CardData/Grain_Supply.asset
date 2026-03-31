@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: Grain_Supply
   m_EditorClassIdentifier: 
   <cardID>k__BackingField: 2211
-  cardName: 
+  cardName: "\uACFC\uC789 \uACF5\uAE09"
   <cardType>k__BackingField: 2
   <Image>k__BackingField: {fileID: 0}
   <Cost>k__BackingField: 0

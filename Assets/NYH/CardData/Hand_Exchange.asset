@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: Hand_Exchange
   m_EditorClassIdentifier: 
   <cardID>k__BackingField: 2216
-  cardName: 
+  cardName: "\uD328 \uAD50\uD658"
   <cardType>k__BackingField: 4
   <Image>k__BackingField: {fileID: 0}
   <Cost>k__BackingField: 1

@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: Golden_Ratio
   m_EditorClassIdentifier: 
   <cardID>k__BackingField: 3102
-  cardName: 
+  cardName: "\uD669\uAE08 \uBE44\uC728"
   <cardType>k__BackingField: 1
   <Image>k__BackingField: {fileID: 0}
   <Cost>k__BackingField: 2

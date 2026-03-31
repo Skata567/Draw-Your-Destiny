@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: Emergency_Treatment
   m_EditorClassIdentifier: 
   <cardID>k__BackingField: 2203
-  cardName: 
+  cardName: "\uC751\uAE09 \uCE58\uB8CC"
   <cardType>k__BackingField: 1
   <Image>k__BackingField: {fileID: 0}
   <Cost>k__BackingField: 2

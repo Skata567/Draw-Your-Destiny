@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: Library
   m_EditorClassIdentifier: 
   <cardID>k__BackingField: 9001
-  cardName: 
+  cardName: "\uB3C4\uC11C\uAD00"
   <cardType>k__BackingField: 5
   <Image>k__BackingField: {fileID: 0}
   <Cost>k__BackingField: 2

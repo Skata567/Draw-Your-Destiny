@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: Scout
   m_EditorClassIdentifier: 
   <cardID>k__BackingField: 1005
-  cardName: 
+  cardName: "\uC815\uCC30"
   <cardType>k__BackingField: 5
   <Image>k__BackingField: {fileID: 0}
   <Cost>k__BackingField: 2

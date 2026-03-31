@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: Continuous_Activity
   m_EditorClassIdentifier: 
   <cardID>k__BackingField: 3112
-  cardName: 
+  cardName: "\uC5F0\uC18D \uD65C\uB3D9"
   <cardType>k__BackingField: 4
   <Image>k__BackingField: {fileID: 0}
   <Cost>k__BackingField: 2

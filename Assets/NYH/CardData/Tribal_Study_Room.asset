@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: Tribal_Study_Room
   m_EditorClassIdentifier: 
   <cardID>k__BackingField: 1008
-  cardName: 
+  cardName: "\uBD80\uC871 \uD559\uC2B5\uC2E4"
   <cardType>k__BackingField: 5
   <Image>k__BackingField: {fileID: 0}
   <Cost>k__BackingField: 1

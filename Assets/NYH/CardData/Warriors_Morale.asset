@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: Warriors_Morale
   m_EditorClassIdentifier: 
   <cardID>k__BackingField: 2001
-  cardName: 
+  cardName: "\uC804\uC0AC\uB4E4\uC758 \uC804\uC758"
   <cardType>k__BackingField: 1
   <Image>k__BackingField: {fileID: 0}
   <Cost>k__BackingField: 2

@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: Wall_Crumbling
   m_EditorClassIdentifier: 
   <cardID>k__BackingField: 2204
-  cardName: 
+  cardName: "\uC131\uBCBD \uC4F0\uB7EC\uB728\uB9AC\uB2E4"
   <cardType>k__BackingField: 1
   <Image>k__BackingField: {fileID: 0}
   <Cost>k__BackingField: 1

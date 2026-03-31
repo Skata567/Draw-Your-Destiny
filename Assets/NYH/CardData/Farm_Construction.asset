@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: Farm_Construction
   m_EditorClassIdentifier: 
   <cardID>k__BackingField: 1104
-  cardName: 
+  cardName: "\uB18D\uC7A5 \uAC74\uC124"
   <cardType>k__BackingField: 5
   <Image>k__BackingField: {fileID: 0}
   <Cost>k__BackingField: 3

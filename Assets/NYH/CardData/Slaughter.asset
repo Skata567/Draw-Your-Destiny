@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: Slaughter
   m_EditorClassIdentifier: 
   <cardID>k__BackingField: 3101
-  cardName: 
+  cardName: "\uC7A5\uC0B4"
   <cardType>k__BackingField: 1
   <Image>k__BackingField: {fileID: 0}
   <Cost>k__BackingField: 1

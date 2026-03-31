@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: Investment
   m_EditorClassIdentifier: 
   <cardID>k__BackingField: 3104
-  cardName: 
+  cardName: "\uD22C\uC790"
   <cardType>k__BackingField: 2
   <Image>k__BackingField: {fileID: 0}
   <Cost>k__BackingField: 1

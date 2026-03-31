@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: Market
   m_EditorClassIdentifier: 
   <cardID>k__BackingField: 3106
-  cardName: 
+  cardName: "\uC2DC\uC7A5"
   <cardType>k__BackingField: 2
   <Image>k__BackingField: {fileID: 0}
   <Cost>k__BackingField: 0

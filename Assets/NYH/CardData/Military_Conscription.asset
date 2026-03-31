@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: Military_Conscription
   m_EditorClassIdentifier: 
   <cardID>k__BackingField: 2201
-  cardName: 
+  cardName: "\uAD70\uC5ED \uC778\uC218"
   <cardType>k__BackingField: 1
   <Image>k__BackingField: {fileID: 0}
   <Cost>k__BackingField: 3

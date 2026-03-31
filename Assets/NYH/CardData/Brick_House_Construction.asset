@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: Brick_House_Construction
   m_EditorClassIdentifier: 
   <cardID>k__BackingField: 3001
-  cardName: 
+  cardName: "\uD55C \uBCBD\uB3CC\uC9D1 \uAC74\uC124"
   <cardType>k__BackingField: 5
   <Image>k__BackingField: {fileID: 0}
   <Cost>k__BackingField: 3

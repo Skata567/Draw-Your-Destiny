@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: Barter_Market
   m_EditorClassIdentifier: 
   <cardID>k__BackingField: 1103
-  cardName: 
+  cardName: "\uBB3C\uBB3C\uAD50\uD658\uC18C"
   <cardType>k__BackingField: 5
   <Image>k__BackingField: {fileID: 0}
   <Cost>k__BackingField: 2
