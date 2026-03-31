@@ -40,6 +40,8 @@ public class GameManager : PersistentSingleton<GameManager>
     public bool endTurn = false;
     public bool startTurn = false;
 
+    public Era playerEra = Era.Stone;
+
     Camera cam;
     [SerializeField] Transform[] humanGenPoints;
 
@@ -81,7 +83,8 @@ public class GameManager : PersistentSingleton<GameManager>
     {
         endTurn = true;
         startTurn = false;
-	}
+        checkResearch();
+    }
 
     // ── 재화 관리 ─────────────────────────────────────────────
     public void AddGold(int amount)
@@ -152,5 +155,23 @@ public class GameManager : PersistentSingleton<GameManager>
     {
         Food += amount;
         Debug.Log($"식량 획득:{amount}");
+    }
+    private void checkResearch()
+    {
+        if (playerResearch >= 100)
+        {
+            if (playerEra == Era.Stone)
+            {
+                playerEra = Era.Bronze;
+                playerResearch -= 100;
+                TileMapManager.Instance?.UpgradeBuildingsForEra(Era.Bronze);
+            }
+            else if (playerEra == Era.Bronze)
+            {
+                playerEra = Era.Iron;
+                playerResearch -= 100;
+                TileMapManager.Instance?.UpgradeBuildingsForEra(Era.Iron);
+            }
+        }
     }
 }
