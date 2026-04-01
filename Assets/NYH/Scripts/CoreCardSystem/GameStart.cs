@@ -49,22 +49,22 @@ public class GameStarter : MonoBehaviour
     private void StartTurnCard()
     {
         if (gameManager != null) gameManager.startTurn = false; // 플래그 리셋
-        //StartCoroutine(StartTurnCardRoutine());
+        StartCoroutine(StartTurnCardRoutine());
     }
 
     // 턴 시작시 카드 3장 덱에 넣기 카드 시스템 합칠때까지 주석처리
-    //private IEnumerator StartTurnCardRoutine()
-    //{
-    //    //카드 선택
-    //    Debug.Log("턴 시작: 카드 3장 중 1장을 덱에 추가한 뒤 5장을 뽑습니다.");
+    private IEnumerator StartTurnCardRoutine()
+    {
+        //카드 선택
+        Debug.Log("턴 시작: 카드 3장 중 1장을 덱에 추가한 뒤 5장을 뽑습니다.");
 
-    //    if (CardSystem.Instance != null)
-    //    {
-    //        //yield return CardSystem.Instance.OfferRandomCatalogCardToDeck(3);
-    //    }
+        if (CardSystem.Instance != null)
+        {
+            yield return CardSystem.Instance.OfferRandomCatalogCardToDeck(3);
+        }
 
-    //    ActionSystem.Instance.Perform(new DrawCardsGA(5));
-    //}
+        ActionSystem.Instance.Perform(new DrawCardsGA(5));
+    }
 
     void Update()
     {

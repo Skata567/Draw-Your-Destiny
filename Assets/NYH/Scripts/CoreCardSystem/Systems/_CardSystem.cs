@@ -1,4 +1,4 @@
-﻿namespace NYH.CoreCardSystem
+﻿/*namespace NYH.CoreCardSystem
 {
     using System.Collections.Generic;
     using UnityEngine;
@@ -50,7 +50,6 @@
 
             Debug.Log("[CardSystem] 초기화 및 액션 등록 완료");
         }
-
 
         public void Setup(List<CardData> initialDeck)
         {
@@ -525,3 +524,4 @@
     }
 }
 
+*/
