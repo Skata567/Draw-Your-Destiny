@@ -5,14 +5,14 @@ public class HumanPool : Singleton<HumanPool>
 {
     public GameObject humanPrefab;
     public int poolSize = 20;
-
+    public Transform poolParent;
     private Queue<GameObject> pool = new Queue<GameObject>();
 
     void Start()
     {
         for (int i = 0; i < poolSize; i++)
         {
-            GameObject human = Instantiate(humanPrefab);
+            GameObject human = Instantiate(humanPrefab, poolParent);
             human.SetActive(false);
             pool.Enqueue(human);
         }
