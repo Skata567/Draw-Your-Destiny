@@ -1,30 +1,23 @@
 ﻿using Unity.VisualScripting;
+using UnityEditor.PackageManager;
 using UnityEngine;
 
 public class TestScripts : MonoBehaviour
 {
-    [SerializeField] CardUseGroup cardUse;
-    
+    [SerializeField] GameManager cardUse;
+    [SerializeField] PlayerUnitInfoByJob unitInfo;
+
     // Update is called once per frame
     void Start()
     {
-        cardUse = FindAnyObjectByType<CardUseGroup>();
+        cardUse = FindAnyObjectByType<GameManager>();
     }
     void Update()
     {
         if (Input.GetKeyDown(KeyCode.A))
         {
-            cardUse.SpawnFarmer(2);
+            cardUse.GenerateHumans(1, unitInfo);
         }
 
-        if (Input.GetKeyDown(KeyCode.S))
-        {
-            cardUse.SpawnMiner(2);
-        }
-
-        if (Input.GetKeyDown(KeyCode.D))
-        {
-            cardUse.SpawnSolider(2);
-        }
     }
 }

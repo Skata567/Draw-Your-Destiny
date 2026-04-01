@@ -52,6 +52,7 @@ public class HumanUnit : MonoBehaviour
     }
     public void UnitAppear() //유닛이 나올 때 초기화하는거
     {
+        humanPool = FindAnyObjectByType<HumanPool>();
         naturalDeathChance = unitInfo.startNaturalDeathChance;
         gender = Random.value < 0.5f ? Gender.Male : Gender.Female;
         ageGroup = AgeGroup.Baby; //처음 나올 때는 응애
