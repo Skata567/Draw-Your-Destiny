@@ -473,7 +473,7 @@ public class TileMapManager : Singleton<TileMapManager>
 
         SpriteRenderer spriteRenderer = buildingObj.AddComponent<SpriteRenderer>();
         spriteRenderer.sprite = building.sprite;
-        spriteRenderer.sortingOrder = 1;
+        spriteRenderer.sortingOrder = 100; //건물 오더레이어
 
         buildingObj.transform.position = GetBuildingWorldCenter(origin, building);
         buildingObj.transform.localScale = new Vector3(building.width, building.height, 1);

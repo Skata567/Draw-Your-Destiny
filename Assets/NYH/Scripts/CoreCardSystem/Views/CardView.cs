@@ -136,7 +136,7 @@
         {
             if (GameManager.Instance.playerGold < Card.Cost)
             {
-                Debug.Log("?��?��?��?��?�� 골드�? �?족하?�� 카드�? ?��?��?���? ?��?��?��?��?��.");
+                Debug.Log("골드가 부족하여 카드를 낼 수 없습니다.");
                 ReturnToHand();
                 return;
             }
