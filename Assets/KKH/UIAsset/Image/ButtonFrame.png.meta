@@ -103,10 +103,10 @@ TextureImporter:
       name: ButtonFrame_0
       rect:
         serializedVersion: 2
-        x: 253
-        y: 290
-        width: 1030
-        height: 478
+        x: 241
+        y: 278
+        width: 1048
+        height: 528
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}

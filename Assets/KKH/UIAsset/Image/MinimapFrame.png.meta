@@ -103,10 +103,10 @@ TextureImporter:
       name: MinimapFrame_0
       rect:
         serializedVersion: 2
-        x: 217
-        y: 104
-        width: 1105
-        height: 848
+        x: 223
+        y: 108
+        width: 1090
+        height: 820
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
