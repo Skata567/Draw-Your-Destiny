@@ -46,26 +46,37 @@ public class CitySpawnManager : MonoBehaviour
 
         List<List<Vector3Int>> cityRegions = FindCityRegions();
 
-        if (cityRegions.Count < 4)
+        // 2. 버려진 영지(잔해)와 겹치는 영역은 시작 도시 후보에서 제외
+        //    잔해 영역은 중립 거점이므로 제거하지 않고 그대로 둠
+        AbandonedTerritoryManager ruins = AbandonedTerritoryManager.Instance;
+        List<List<Vector3Int>> eligibleRegions = new List<List<Vector3Int>>();
+        foreach (var region in cityRegions)
         {
-            Debug.LogError($"[CitySpawnManager] 도시 영역 {cityRegions.Count}개 감지 — 최소 4개 필요.");
+            bool isRuins = ruins != null && region.Exists(pos => ruins.IsInRuins(pos));
+            if (!isRuins)
+                eligibleRegions.Add(region);
+        }
+
+        if (eligibleRegions.Count < 4)
+        {
+            Debug.LogError($"[CitySpawnManager] 시작 가능한 도시 영역 {eligibleRegions.Count}개 감지 — 최소 4개 필요. (잔해 영역 제외 후)");
             return;
         }
 
-        // 2. 랜덤으로 4개 인덱스 선택
-        List<int> selectedIdx = PickRandomIndices(cityRegions.Count, 4);
+        // 3. 랜덤으로 4개 인덱스 선택 (잔해 영역 제외 후보에서만)
+        List<int> selectedIdx = PickRandomIndices(eligibleRegions.Count, 4);
 
-        // 3. 미사용 도시 제거 (city 타일 전체 + 주변 farmland)
-        for (int i = 0; i < cityRegions.Count; i++)
+        // 4. 미사용 도시 제거 (선택 안 된 eligible 영역만, 잔해는 건드리지 않음)
+        for (int i = 0; i < eligibleRegions.Count; i++)
         {
             if (!selectedIdx.Contains(i))
-                RemoveCityRegion(cityRegions[i]);
+                RemoveCityRegion(eligibleRegions[i]);
         }
 
-        // 4. 선택된 도시에 문명 배치
+        // 5. 선택된 도시에 문명 배치
         for (int i = 0; i < selectedIdx.Count; i++)
         {
-            List<Vector3Int> region = cityRegions[selectedIdx[i]];
+            List<Vector3Int> region = eligibleRegions[selectedIdx[i]];
             Vector3Int center = GetCenter(region);
             BoundsInt bounds = GetBounds(region);
             spawnedCityCenters.Add(center);

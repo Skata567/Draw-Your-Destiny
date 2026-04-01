@@ -16,6 +16,7 @@ using UnityEngine;
 //   OnCaptured / OnOutpostBuilt / OnRecaptured / OnLost 이벤트 구독
 //   TryCapture(unitPos, civID) 호출 (LSH 유닛 시스템에서)
 // ============================================================
+[DefaultExecutionOrder(5)] // CitySpawnManager(10)보다 먼저 실행 → IsInRuins() 사용 가능
 public class AbandonedTerritoryManager : Singleton<AbandonedTerritoryManager>
 {
     [Header("잔해 위치 설정")]
