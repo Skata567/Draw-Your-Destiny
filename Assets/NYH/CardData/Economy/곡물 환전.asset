@@ -19,7 +19,8 @@ MonoBehaviour:
     type: 3}
   <Cost>k__BackingField: 1
   description: "\uCE74\uB4DC \uC0AC\uC6A9 \uC2DC \uD574\uB2F9 \uD134 \uBCF4\uC720\uD55C
-    \uAE08\uC758 10%\uB9CC\uD07C \uC2DD\uB7C9\uC744 \uCD94\uAC00\uB85C \uD68D\uB4DD\uD569\uB2C8\uB2E4."
+    \uAE08\uC758 {percentAmount}%\uB9CC\uD07C \uC2DD\uB7C9\uC744 \uCD94\uAC00\uB85C
+    \uD68D\uB4DD\uD569\uB2C8\uB2E4."
   <Effects>k__BackingField:
   - rid: 5056991553752137804
   references:
@@ -28,4 +29,4 @@ MonoBehaviour:
     - rid: 5056991553752137804
       type: {class: ConvertGoldToFoodEffect, ns: , asm: Assembly-CSharp}
       data:
-        percent: 10
+        percentAmount: 0

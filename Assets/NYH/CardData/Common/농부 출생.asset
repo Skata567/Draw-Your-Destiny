@@ -18,7 +18,7 @@ MonoBehaviour:
   <Image>k__BackingField: {fileID: 21300000, guid: e15a0aaf619d8aa429bd091186fb29a2,
     type: 3}
   <Cost>k__BackingField: 1
-  description: "\uB18D\uBD80 5\uBA85\uC774 \uD0DC\uC5B4\uB0A9\uB2C8\uB2E4."
+  description: "\uB18D\uBD80 {unitAmount}\uBA85\uC774 \uD0DC\uC5B4\uB0A9\uB2C8\uB2E4."
   <Effects>k__BackingField:
   - rid: 2172718143113527375
   references:
@@ -28,4 +28,4 @@ MonoBehaviour:
       type: {class: GenerateHumanEffect, ns: , asm: Assembly-CSharp}
       data:
         unitInfo: {fileID: 11400000, guid: a629766ba16ceb347868691e150c9b54, type: 2}
-        amount: 5
+        unitAmount: 0
