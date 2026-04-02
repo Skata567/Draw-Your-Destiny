@@ -1,13 +1,13 @@
 fileFormatVersion: 2
-guid: d8420514361126743a70321a8bc970a2
+guid: 7340ce2924182be45a30a953e23c6ef2
 TextureImporter:
   internalIDToNameTable:
   - first:
-      213: 1764527668196454919
-    second: EnemyB_0
+      213: -6940666901648188292
+    second: GrandEnemyB_0
   - first:
-      213: 4939859758995839491
-    second: EnemyB_1
+      213: 8193713900873011303
+    second: GrandEnemyB_1
   externalObjects: {}
   serializedVersion: 13
   mipmaps:
@@ -40,7 +40,7 @@ TextureImporter:
   maxTextureSize: 2048
   textureSettings:
     serializedVersion: 2
-    filterMode: 0
+    filterMode: 1
     aniso: 1
     mipBias: 0
     wrapU: 1
@@ -54,7 +54,7 @@ TextureImporter:
   spriteMeshType: 1
   alignment: 0
   spritePivot: {x: 0.5, y: 0.5}
-  spritePixelsToUnits: 12
+  spritePixelsToUnits: 100
   spriteBorder: {x: 0, y: 0, z: 0, w: 0}
   spriteGenerateFallbackPhysicsShape: 1
   alphaUsage: 1
@@ -78,7 +78,7 @@ TextureImporter:
     maxTextureSize: 2048
     resizeAlgorithm: 0
     textureFormat: -1
-    textureCompression: 0
+    textureCompression: 1
     compressionQuality: 50
     crunchedCompression: 0
     allowsAlphaSplitting: 0
@@ -99,11 +99,24 @@ TextureImporter:
     ignorePlatformSupport: 0
     androidETC2FallbackOverride: 0
     forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 4
+    buildTarget: Android
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
   spriteSheet:
     serializedVersion: 2
     sprites:
     - serializedVersion: 2
-      name: EnemyB_0
+      name: GrandEnemyB_0
       rect:
         serializedVersion: 2
         x: 1
@@ -118,14 +131,14 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: -1
       bones: []
-      spriteID: 702b23bb09cdc7810800000000000000
-      internalID: 1764527668196454919
+      spriteID: c7cd2f6e93ccdaf90800000000000000
+      internalID: -6940666901648188292
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: EnemyB_1
+      name: GrandEnemyB_1
       rect:
         serializedVersion: 2
         x: 13
@@ -140,8 +153,8 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: -1
       bones: []
-      spriteID: 30a913f3748ed8440800000000000000
-      internalID: 4939859758995839491
+      spriteID: 76057b4716be5b170800000000000000
+      internalID: 8193713900873011303
       vertices: []
       indices: 
       edges: []
@@ -160,8 +173,8 @@ TextureImporter:
     spriteCustomMetadata:
       entries: []
     nameFileIdTable:
-      EnemyB_0: 1764527668196454919
-      EnemyB_1: 4939859758995839491
+      GrandEnemyB_0: -6940666901648188292
+      GrandEnemyB_1: 8193713900873011303
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 
