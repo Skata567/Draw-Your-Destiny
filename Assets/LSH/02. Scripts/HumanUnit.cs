@@ -37,6 +37,7 @@ public class HumanUnit : MonoBehaviour
     private PlayerUnitInfoByJob playerInfo;
     public int ownerCivID;
     private CancellationTokenSource moveCts;
+
     void Update()
     {
         if (Input.GetKeyDown(KeyCode.Space)) //실험용
