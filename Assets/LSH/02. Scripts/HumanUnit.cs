@@ -36,6 +36,8 @@ public class HumanUnit : MonoBehaviour
     private BuildingType curbuildingType = BuildingType.None;
     //private BuildingType 
     //private bool isDead = false;
+    [SerializeField] private bool isFarming = false;
+    private Vector3Int farmingTargetCell; //농사 타일 감지
 
     private PlayerUnitInfoByJob playerInfo;
     public int ownerCivID;
@@ -174,10 +176,9 @@ public class HumanUnit : MonoBehaviour
 
     private void StartMoveLoop()
     {
-        StopMoveLoop();
-
-        moveCts = new CancellationTokenSource(); //토큰생성
-        RamdomMoveLoop(moveCts.Token).Forget();
+            StopMoveLoop();
+            moveCts = new CancellationTokenSource(); //토큰생성
+            RamdomMoveLoop(moveCts.Token).Forget();
     }
     private void StopMoveLoop()
     {
@@ -270,6 +271,74 @@ public class HumanUnit : MonoBehaviour
             // 이동 시작
             isMoving = true;
         }
+    }
+    void StartFarming()
+    {
+        if (!TryFindNearestFarm(out Vector3Int farmCell))
+        {
+            Debug.Log("근처에 갈 수 있는 Farm이 없음");
+            return;
+        }
+
+        Vector3Int startCell = TileMapManager.Instance.groundTilemap.WorldToCell(transform.position);
+
+        List<Vector3Int> path = PathFindingManager.Instance.FindPath(startCell, farmCell);
+
+        if (path == null || path.Count == 0)
+        {
+            Debug.Log("Farm까지 가는 길이 없음");
+            return;
+        }
+
+        StopMoveLoop(); // 자동 랜덤 이동 중지
+        isFarming = false; // 아직 도착 전
+        farmingTargetCell = farmCell;
+
+        currentPath = path;
+        pathIndex = 0;
+        isMoving = true;
+    }
+
+    bool TryFindNearestFarm(out Vector3Int farmCell)
+    {
+        farmCell = Vector3Int.zero;
+
+        TileMapManager tileMapManager = TileMapManager.Instance;
+        if (tileMapManager == null)
+            return false;
+
+        List<BuildingInstance> buildings = tileMapManager.GetAllBuildings();
+        if (buildings == null || buildings.Count == 0)
+            return false;
+
+        Vector3Int currentCell = tileMapManager.groundTilemap.WorldToCell(transform.position);
+
+        float minDist = float.MaxValue;
+        bool found = false;
+
+        foreach (var building in buildings)
+        {
+            if (building == null || building.data == null)
+                continue;
+
+            if (building.data.buildingType != BuildingType.Farm)
+                continue;
+
+            // 필요하면 내 진영 건물만 허용
+            if (building.ownerCivID != ownerCivID)
+                continue;
+
+            float dist = Vector3Int.Distance(currentCell, building.origin);
+
+            if (dist < minDist)
+            {
+                minDist = dist;
+                farmCell = building.origin;
+                found = true;
+            }
+        }
+
+        return found;
     }
 
     void MoveAlongPath()
