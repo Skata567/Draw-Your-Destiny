@@ -88,6 +88,14 @@ public class GameManager : PersistentSingleton<GameManager>
         if (citySpawnManager.TryGetSpawnedCityBounds(0, out BoundsInt cityBounds))
         {
             playerLordCastle.Initialize(tileMapManager.buildingTilemap, cityBounds);
+
+            if (cam == null) cam = Camera.main;
+            if (cam != null)
+            {
+                Vector3 castlePos = playerLordCastle.transform.position;
+                cam.transform.position = new Vector3(castlePos.x, castlePos.y, cam.transform.position.z);
+            }
+
             Debug.Log("[GameManager] 플레이어 영주성 배치 완료.");
         }
         else
