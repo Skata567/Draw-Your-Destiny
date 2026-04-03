@@ -1,5 +1,6 @@
 ﻿using DG.Tweening;
 using NYH.CoreCardSystem;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.U2D.IK;
@@ -45,6 +46,9 @@ public class GameManager : PersistentSingleton<GameManager>
     Camera cam;
     [SerializeField] int lordCastleSize = 4; // 영주성 크기
 
+    [Header("플레이어 영주성")]
+    [SerializeField] PlayerLordCastle playerLordCastle;
+
     private CitySpawnManager citySpawnManager;
 
     protected override void Awake()
@@ -52,6 +56,50 @@ public class GameManager : PersistentSingleton<GameManager>
         base.Awake();
         InitializeManagers();
         cam = Camera.main;
+    }
+
+    private void Start()
+    {
+        StartCoroutine(InitPlayerLordCastleNextFrame());
+    }
+
+    private IEnumerator InitPlayerLordCastleNextFrame()
+    {
+        yield return null;
+
+        if (playerLordCastle == null)
+        {
+            Debug.LogWarning("[GameManager] playerLordCastle이 연결되지 않았습니다.");
+            yield break;
+        }
+
+        if (citySpawnManager == null)
+            citySpawnManager = FindFirstObjectByType<CitySpawnManager>();
+
+        if (tileMapManager == null)
+            tileMapManager = TileMapManager.Instance;
+
+        if (tileMapManager == null || tileMapManager.buildingTilemap == null)
+        {
+            Debug.LogWarning("[GameManager] 플레이어 영주성 배치에 필요한 TileMapManager를 찾을 수 없습니다.");
+            yield break;
+        }
+
+        if (citySpawnManager.TryGetSpawnedCityBounds(0, out BoundsInt cityBounds))
+        {
+            playerLordCastle.Initialize(tileMapManager.buildingTilemap, cityBounds);
+            Debug.Log("[GameManager] 플레이어 영주성 배치 완료.");
+        }
+        else
+        {
+            Debug.LogWarning("[GameManager] 플레이어 도시 bounds를 찾을 수 없습니다.");
+        }
+    }
+
+    public void GameOver()
+    {
+        Debug.Log("[GameManager] 게임 오버 — 플레이어 영주성 함락.");
+        // TODO: 게임 오버 UI 연결
     }
 
     // 씬 시작 시 필요한 매니저 참조 수집
