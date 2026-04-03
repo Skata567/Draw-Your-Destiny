@@ -1,4 +1,4 @@
-﻿namespace NYH.CoreCardSystem
+﻿/*namespace NYH.CoreCardSystem
 {
     using System.Collections.Generic;
     using UnityEngine;
@@ -45,8 +45,6 @@
             ActionSystem.AttachPerformer<ResearchpointsGA>(action => Perform(action));            //연구 포인트 획득 액션
             ActionSystem.AttachPerformer<IncreasePopulationGA>(action => Perform(action));        //인구 증가 획득 액션
             ActionSystem.AttachPerformer<CostPlusGA>(action => Perform(action));                  //코스트 증가
-            ActionSystem.AttachPerformer<GenerateHumanGA>(action => Perform(action));             //인간 생성
-            ActionSystem.AttachPerformer<IncreaseFoodGA>(action => Perform(action));              //식량 추가
             ActionSystem.AttachPerformer<ZeroCostHandGA>(action => Perform(action));              //손패 코스트 0으로 변경 액션
             ActionSystem.AttachPerformer<PlayBuildingGA>(action => Perform(action));              //건물 설치 액션
 
@@ -206,16 +204,6 @@
                     if (view.Card == costPlusGA.SourceCard && !view.IsHoverPreview) view.Setup(view.Card);
                 }
             }
-            else if (action is GenerateHumanGA generateHumanGA)
-            {
-                GameManager.Instance.GenerateHumans(generateHumanGA.Amount, generateHumanGA._UnitInfo);
-                yield return null;
-            }
-            else if (action is IncreaseFoodGA increaseFoodGA)
-            {
-                GameManager.Instance.AddFood(increaseFoodGA.Amount);
-                yield return null;
-            }
             else if (action is ZeroCostHandGA zeroCostHandGA)
             {
                 // 1. 인스펙터에서 설정한 cardAmount만큼의 카드 코스트를 costAmount로 변경합니다.
@@ -248,7 +236,7 @@
         /// 설치 카드의 배치 가능 여부를 확인한 뒤,
         /// 카드 사용이 끝나면 해당 좌표에 건물을 설치하도록 순차 실행합니다.
         /// </summary>
-        public bool TryQueuePlacementCard(Card sourceCard, Vector3Int targetPos, bool isTargetingMode)
+        public bool TryQueuePlacementCard(Card sourceCard, Vector3Int targetPos)
         {
             if (sourceCard == null)
             {
@@ -275,12 +263,6 @@
                 return false;
             }
 
-            if (!isTargetingMode)
-            {
-                Debug.LogWarning($"[_CardSystem] {sourceCard.Title} 건물 카드는 가운데 배치 모드에서만 사용할 수 있습니다.");
-                return false;
-            }
-
             if (TileMapManager.Instance == null)
             {
                 Debug.LogError("[_CardSystem] TileMapManager가 없어 건물을 설치할 수 없습니다.");
@@ -296,10 +278,11 @@
             Debug.Log($"[_CardSystem] 배치 성공, PlayCardGA 예약: card={sourceCard?.Title}, pos={targetPos}");
             ActionSystem.Instance.Perform(
                 new PlayCardGA(sourceCard),
-                () => ActionSystem.Instance.Perform(new PlayBuildingGA(sourceCard, installEffect.buildingData, targetPos, isTargetingMode))
+                () => ActionSystem.Instance.Perform(new PlayBuildingGA(installEffect.buildingData, targetPos))
             );
             return true;
         }
+
         /// <summary>
         /// [발견 로직] 덱에서 N장을 보여주고 하나를 고릅니다.
         /// </summary>
@@ -356,12 +339,6 @@
                 yield break;
             }
 
-            if (!playBuildingGA.IsTargetingMode)
-            {
-                Debug.LogWarning($"[_CardSystem] {playBuildingGA.SourceCard?.Title} 건물 카드는 가운데 배치 모드가 아니어서 설치를 취소합니다.");
-                yield break;
-            }
-
             if (TileMapManager.Instance == null)
             {
                 Debug.LogError("[_CardSystem] TileMapManager가 없어 건물을 설치할 수 없습니다.");
@@ -378,6 +355,7 @@
             Debug.Log($"[_CardSystem] {playBuildingGA.Data.buildingName} 설치 완료: {playBuildingGA.TargetPos}");
             yield return null;
         }
+
         private IEnumerator PlayCardPerformer(PlayCardGA playCardGA)
         {
             Debug.Log($"[_CardSystem] PlayCardPerformer 진입: card={playCardGA.Card?.Title}");
@@ -545,7 +523,4 @@
         }
     }
 }
-
-
-
-
+*/
