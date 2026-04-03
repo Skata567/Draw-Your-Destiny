@@ -24,4 +24,4 @@ MonoBehaviour:
   allowedTiles: 04000000
   goldPerTurn: 0
   populationCapBonus: 0
-  soldierCapacity: 0
+  soldierCapacity: -1

@@ -313,6 +313,7 @@ public class TileMapManager : Singleton<TileMapManager>
             buildingMap[pos] = instance.data; // data가 null이면 null 등록 (충돌 방지용)
             buildingInstanceMap[pos] = instance;
         }
+        BuildingRegistry.Instance?.Register(instance);
     }
 
     // ── 건물 배치 가능 여부 확인 ─────────────────────────────────
@@ -456,6 +457,7 @@ public class TileMapManager : Singleton<TileMapManager>
         }
 
         FogManager.Instance?.OnBuildingPlaced(instance);
+        BuildingRegistry.Instance?.Register(instance);
 
         GameManager gameManager = GameManager.Instance;
         if (gameManager != null)
@@ -519,6 +521,7 @@ public class TileMapManager : Singleton<TileMapManager>
             Destroy(originObj);
             buildingObjects.Remove(instance.origin);
         }
+        BuildingRegistry.Instance?.Remove(instance);
     }
 
     // ── 건물 기준점 계산 (StarCraft 방식) ────────────────────────
@@ -850,6 +853,7 @@ public class TileMapManager : Singleton<TileMapManager>
         }
 
         FogManager.Instance?.OnBuildingPlaced(instance);
+        BuildingRegistry.Instance?.Register(instance);
 
         // 플레이어용 GameManager 자원 처리 없음
         return true;
