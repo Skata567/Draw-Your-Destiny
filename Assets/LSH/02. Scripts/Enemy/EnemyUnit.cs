@@ -32,6 +32,8 @@ public class EnemyUnit : MonoBehaviour
 
     public int ownerCivID;
     private CancellationTokenSource moveCts;
+
+    private Animator anime;
     void Update()
     {
         if (Input.GetKeyDown(KeyCode.Space)) // 실험용
@@ -54,7 +56,7 @@ public class EnemyUnit : MonoBehaviour
         gender = Random.value < 0.5f ? Gender.Male : Gender.Female;
         ageGroup = AgeGroup.Baby;
         age = enemyInfo.babyStartAge;
-
+        anime = GetComponent<Animator>();
         // 이동 관련 초기화
         currentPath.Clear();
         pathIndex = 0;
@@ -84,7 +86,7 @@ public class EnemyUnit : MonoBehaviour
         ChangeAgeGroup();
         ChangeDeathPer();
         CheckCardUsing();
-
+        anime.SetInteger("age", age);
         if (Random.value < naturalDeathChance)
         {
             Dead();

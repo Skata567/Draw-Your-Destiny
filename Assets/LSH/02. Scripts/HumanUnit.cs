@@ -31,7 +31,7 @@ public class HumanUnit : MonoBehaviour
     [SerializeField] public Job job;
     [Header("애니메이션 모음")]
     [SerializeField] public Animator anime;
-    
+
 
     private BuildingType curbuildingType = BuildingType.None;
     //private BuildingType 
@@ -40,14 +40,13 @@ public class HumanUnit : MonoBehaviour
     private PlayerUnitInfoByJob playerInfo;
     public int ownerCivID;
     private CancellationTokenSource moveCts;
-
     void Update()
     {
         if (Input.GetKeyDown(KeyCode.Space)) //실험용
         {
             UnitNextTurn();
         }
-        if(Input.GetKeyDown(KeyCode.R))
+        if (Input.GetKeyDown(KeyCode.R))
         {
             UseAdultUnitCard();
         }
@@ -62,7 +61,7 @@ public class HumanUnit : MonoBehaviour
         ageGroup = AgeGroup.Baby; //처음 나올 때는 응애
         age = unitInfo.babyStartAge;
         anime = GetComponent<Animator>();
-        
+
         switch (job) //직업에 따른 초기화를 여기서 하도록
         {
             case Job.Farmer:
@@ -202,7 +201,7 @@ public class HumanUnit : MonoBehaviour
     }
     public void ChangeAgeGroup()//나이 그룹 바뀌는거는 이거
     {
-        switch(age)
+        switch (age)
         {
             case < 3:
                 ageGroup = AgeGroup.Baby;
@@ -224,10 +223,10 @@ public class HumanUnit : MonoBehaviour
                 naturalDeathChance = unitInfo.startNaturalDeathChance;
                 break;
             case AgeGroup.Adult:
-                naturalDeathChance = unitInfo.naturalDeathIncreasePerTurn*2;
+                naturalDeathChance = unitInfo.naturalDeathIncreasePerTurn * 2;
                 break;
             case AgeGroup.Old:
-                naturalDeathChance = 0.7f + unitInfo.naturalDeathIncreasePerTurn * (age - 14f); 
+                naturalDeathChance = 0.7f + unitInfo.naturalDeathIncreasePerTurn * (age - 14f);
                 break;
         }
     }
