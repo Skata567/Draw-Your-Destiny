@@ -52,6 +52,11 @@ public class HumanUnit : MonoBehaviour
         {
             UseAdultUnitCard();
         }
+        if(Input.GetKeyDown(KeyCode.V))
+        {
+            Debug.Log("D눌럿음 시발");
+            StartFarming();
+        }
         HandleClickMove();
         MoveAlongPath();
     }

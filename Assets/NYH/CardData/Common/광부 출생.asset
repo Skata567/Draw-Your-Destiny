@@ -18,7 +18,7 @@ MonoBehaviour:
   <Image>k__BackingField: {fileID: 7297769827889731970, guid: a9c1230f83eaca747a59c0c9901b7664,
     type: 3}
   <Cost>k__BackingField: 1
-  description: "\uB18D\uBD80 {unitAmount}\uBA85\uC774 \uD0DC\uC5B4\uB0A9\uB2C8\uB2E4."
+  description: "\uAD11\uBD80 {unitAmount}\uBA85\uC774 \uD0DC\uC5B4\uB0A9\uB2C8\uB2E4."
   <Effects>k__BackingField:
   - rid: 2172718143113527373
   references:
