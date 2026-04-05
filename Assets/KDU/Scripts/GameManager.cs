@@ -4,6 +4,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.U2D.IK;
+using System;
 
 // ============================================================
 // GameManager — 게임 전체 상태 관리 (PersistentSingleton)
@@ -42,6 +43,7 @@ public class GameManager : PersistentSingleton<GameManager>
     public bool startTurn = false;
 
     public Era playerEra = Era.Stone;
+    public event Action<Era> OnEraChanged; // 시대 변경 이벤트 추가
 
     Camera cam;
     [SerializeField] int lordCastleSize = 4; // 영주성 크기
@@ -186,7 +188,7 @@ public class GameManager : PersistentSingleton<GameManager>
         // Fisher-Yates 셔플
         for (int i = spawnTiles.Count - 1; i > 0; i--)
         {
-            int rand = Random.Range(0, i + 1);
+            int rand = UnityEngine.Random.Range(0, i + 1);
             (spawnTiles[i], spawnTiles[rand]) = (spawnTiles[rand], spawnTiles[i]);
         }
 
@@ -240,12 +242,14 @@ public class GameManager : PersistentSingleton<GameManager>
             {
                 playerEra = Era.Bronze;
                 playerResearch -= 100;
+                OnEraChanged?.Invoke(playerEra); // 이벤트 호출
                 TileMapManager.Instance?.UpgradeBuildingsForEra(Era.Bronze);
             }
             else if (playerEra == Era.Bronze)
             {
                 playerEra = Era.Iron;
                 playerResearch -= 100;
+                OnEraChanged?.Invoke(playerEra); // 이벤트 호출
                 TileMapManager.Instance?.UpgradeBuildingsForEra(Era.Iron);
             }
         }
