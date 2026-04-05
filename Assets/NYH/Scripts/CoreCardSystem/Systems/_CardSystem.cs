@@ -1,4 +1,4 @@
-﻿/*namespace NYH.CoreCardSystem
+﻿namespace NYH.CoreCardSystem
 {
     using System.Collections.Generic;
     using UnityEngine;
@@ -549,17 +549,16 @@
             CardListUI.Instance.Show(shuffledCopy, "무덤 확인");
         }
 
-        private void BuildEraMap()
-        {
-            eraCardMap.Clear();
-            foreach (var eraCard in eraCards)
-            {
-                if (eraCard != null && !eraCardMap.ContainsKey(eraCard.eraID))
-                {
-                    eraCardMap[eraCard.eraID] = eraCard;
-                }
-            }   
-        }
+        //private void BuildEraMap()
+        //{
+        //    eraCardMap.Clear();
+        //    foreach (var eraCard in eraCards)
+        //    {
+        //        if (eraCard != null && !eraCardMap.ContainsKey(eraCard.eraID))
+        //        {
+        //            eraCardMap[eraCard.eraID] = eraCard;
+        //        }
+        //    }   
+        //}
     }
 }
-*/

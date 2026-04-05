@@ -45,6 +45,7 @@ public class HumanUnit : MonoBehaviour
     private BuildingInstance assignedFarm;   // 현재 배정된 농장
     [Header("농장 배정 상태")]
     [SerializeField]private bool isAssignedToFarm = false;   // 이미 배정됐는지
+    private bool isProcessingFarmAssignment = false; //농장배정처리 확인용
     void Update()
     {
         if (Input.GetKeyDown(KeyCode.Space)) //실험용
@@ -55,11 +56,10 @@ public class HumanUnit : MonoBehaviour
         {
             UseAdultUnitCard();
         }
-        if(Input.GetKeyDown(KeyCode.V))
-        {
-            Debug.Log("D눌럿음 시발");
-            StartFarming();
-        }
+        //if(Input.GetKeyDown(KeyCode.V))
+        //{
+        //    StartFarming();
+        //}
         HandleClickMove();
         MoveAlongPath();
     }
@@ -229,11 +229,23 @@ public class HumanUnit : MonoBehaviour
 
     }
     //void DoingBehavier(behavier)
-    void Dead() //죽는거는 이거
+    void Dead()
     {
         StopMoveLoop();
-        //UnitAppear(); //죽으면 초기화
+
+        BuildingInstance oldFarm = assignedFarm;
+
+        if (BuildingRegistry.Instance != null)
+            BuildingRegistry.Instance.UnassignFarmer(this);//농장 배정 해제
+
+        assignedFarm = null;
+        isAssignedToFarm = false;
+        isProcessingFarmAssignment = false;
+
         humanPool.ReturnHuman(this.gameObject);
+
+        if (BuildingRegistry.Instance != null && oldFarm != null)
+            BuildingRegistry.Instance.NotifyFarmVacancy(oldFarm);//농장 빈자리 알림
     }
     public void ChangeAgeGroup()//나이 그룹 바뀌는거는 이거
     {
@@ -315,17 +327,20 @@ public class HumanUnit : MonoBehaviour
             return;
         }
 
-        if (isAssignedToFarm)
+        if (isAssignedToFarm || isProcessingFarmAssignment)
             return;
 
         if (BuildingRegistry.Instance == null)
             return;
+
+        isProcessingFarmAssignment = true;
 
         Vector3Int currentCell = TileMapManager.Instance.groundTilemap.WorldToCell(transform.position);
         BuildingInstance farm = BuildingRegistry.Instance.FindNearestAvailableFarm(currentCell, ownerCivID);
 
         if (farm == null)
         {
+            isProcessingFarmAssignment = false;
             Debug.Log("배정 가능한 Farm이 없음");
             return;
         }
@@ -333,6 +348,7 @@ public class HumanUnit : MonoBehaviour
         bool assigned = BuildingRegistry.Instance.TryAssignFarmer(farm, this);
         if (!assigned)
         {
+            isProcessingFarmAssignment = false;
             Debug.Log("Farm 배정 실패");
             return;
         }
@@ -343,12 +359,14 @@ public class HumanUnit : MonoBehaviour
             BuildingRegistry.Instance.UnassignFarmer(this);
             assignedFarm = null;
             isAssignedToFarm = false;
+            isProcessingFarmAssignment = false;
             Debug.Log("Farm으로 이동 실패");
             return;
         }
 
         assignedFarm = farm;
         isAssignedToFarm = true;
+        isProcessingFarmAssignment = false;
 
         Debug.Log($"{name} 이 Farm으로 배정되어 이동 시작");
     }
@@ -497,9 +515,9 @@ public class HumanUnit : MonoBehaviour
         {
             BuildingRegistry.Instance.OnBuildingRegistered += HandleBuildingRegistered;
             BuildingRegistry.Instance.OnBuildingRemoved += HandleBuildingRemoved;
+            BuildingRegistry.Instance.OnFarmVacancyAvailable += HandleFarmVacancyAvailable;
         }
 
-        // 이미 농장이 있는 상태에서 유닛이 활성화되었으면 바로 찾게
         StartFarming();
     }
     private void OnDisable()
@@ -511,10 +529,12 @@ public class HumanUnit : MonoBehaviour
             BuildingRegistry.Instance.UnassignFarmer(this);
             BuildingRegistry.Instance.OnBuildingRegistered -= HandleBuildingRegistered;
             BuildingRegistry.Instance.OnBuildingRemoved -= HandleBuildingRemoved;
+            BuildingRegistry.Instance.OnFarmVacancyAvailable -= HandleFarmVacancyAvailable;
         }
 
         assignedFarm = null;
         isAssignedToFarm = false;
+        isProcessingFarmAssignment = false;
     }
     private void HandleBuildingRegistered(BuildingInstance building)
     {
@@ -530,32 +550,10 @@ public class HumanUnit : MonoBehaviour
         if (building.ownerCivID != ownerCivID)
             return;
 
-        if (isAssignedToFarm)
+        if (isAssignedToFarm || isProcessingFarmAssignment)
             return;
 
-        if (BuildingRegistry.Instance == null)
-            return;
-
-        if (!BuildingRegistry.Instance.HasVacancy(building))
-            return;
-
-        bool assigned = BuildingRegistry.Instance.TryAssignFarmer(building, this);
-        if (!assigned)
-            return;
-
-        bool moved = MoveToBuilding(building);
-        if (!moved)
-        {
-            BuildingRegistry.Instance.UnassignFarmer(this);
-            assignedFarm = null;
-            isAssignedToFarm = false;
-            return;
-        }
-
-        assignedFarm = building;
-        isAssignedToFarm = true;
-
-        Debug.Log($"{name} 이 새 Farm 빈자리에 자동 배정됨");
+        HandleFarmVacancyAvailable(building);
     }
 
     private void HandleBuildingRemoved(BuildingInstance building)
@@ -569,12 +567,60 @@ public class HumanUnit : MonoBehaviour
 
             assignedFarm = null;
             isAssignedToFarm = false;
+            isProcessingFarmAssignment = false;
 
             StartMoveLoop();
-            StartFarming(); // 다른 빈 농장 있으면 재배정
+            StartFarming();
         }
     }
+    private void HandleFarmVacancyAvailable(BuildingInstance farm)
+    {
+        if (job != Job.Farmer)
+            return;
 
+        if (farm == null || farm.data == null)
+            return;
+
+        if (farm.data.buildingType != BuildingType.Farm)
+            return;
+
+        if (farm.ownerCivID != ownerCivID)
+            return;
+
+        if (isAssignedToFarm || isProcessingFarmAssignment)
+            return;
+
+        if (BuildingRegistry.Instance == null)
+            return;
+
+        if (!BuildingRegistry.Instance.HasVacancy(farm))
+            return;
+
+        isProcessingFarmAssignment = true;
+
+        bool assigned = BuildingRegistry.Instance.TryAssignFarmer(farm, this);
+        if (!assigned)
+        {
+            isProcessingFarmAssignment = false;
+            return;
+        }
+
+        bool moved = MoveToBuilding(farm);
+        if (!moved)
+        {
+            BuildingRegistry.Instance.UnassignFarmer(this);
+            assignedFarm = null;
+            isAssignedToFarm = false;
+            isProcessingFarmAssignment = false;
+            return;
+        }
+
+        assignedFarm = farm;
+        isAssignedToFarm = true;
+        isProcessingFarmAssignment = false;
+
+        Debug.Log($"{name} 이 기존 Farm 빈자리에 자동 투입됨");
+    }
     private void SetPlayerUnitInfo()
     {
         if (playerInfo == null)

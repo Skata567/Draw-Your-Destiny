@@ -12,10 +12,11 @@ public class BuildingRegistry : MonoBehaviour
     public event Action<BuildingInstance> OnBuildingRegistered;
     public event Action<BuildingInstance> OnBuildingRemoved;
 
-    [Header("농장당 최대 농부 수")]
+    // 빈자리 알림 이벤트
+    public event Action<BuildingInstance> OnFarmVacancyAvailable;
+
     [SerializeField] private int maxFarmersPerFarm = 5;
 
-    // 농장별 배정된 농부 목록
     private Dictionary<BuildingInstance, HashSet<HumanUnit>> farmAssignments
         = new Dictionary<BuildingInstance, HashSet<HumanUnit>>();
 
@@ -47,6 +48,12 @@ public class BuildingRegistry : MonoBehaviour
             farmAssignments[building] = new HashSet<HumanUnit>();
 
         OnBuildingRegistered?.Invoke(building);
+
+        // 새 농장 등록 시 한 번만 빈자리 알림
+        if (type == BuildingType.Farm && HasVacancy(building))
+        {
+            NotifyFarmVacancy(building);
+        }
     }
 
     public void Remove(BuildingInstance building)
@@ -108,7 +115,6 @@ public class BuildingRegistry : MonoBehaviour
             farmAssignments[farm] = new HashSet<HumanUnit>();
 
         HashSet<HumanUnit> assigned = farmAssignments[farm];
-
         assigned.RemoveWhere(h => h == null || !h.gameObject.activeInHierarchy);
 
         if (assigned.Contains(farmer))
@@ -164,5 +170,20 @@ public class BuildingRegistry : MonoBehaviour
         }
 
         return nearestFarm;
+    }
+
+    // 외부에서 안전하게 빈자리 알림을 보낼 때만 사용
+    public void NotifyFarmVacancy(BuildingInstance farm)
+    {
+        if (farm == null || farm.data == null)
+            return;
+
+        if (farm.data.buildingType != BuildingType.Farm)
+            return;
+
+        if (!HasVacancy(farm))
+            return;
+
+        OnFarmVacancyAvailable?.Invoke(farm);
     }
 }
