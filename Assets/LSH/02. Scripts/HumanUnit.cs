@@ -84,6 +84,9 @@ public class HumanUnit : MonoBehaviour
             case Job.Miner:
                 koreanArmy = false;
                 break;
+            case Job.Merchant:
+                koreanArmy = false;
+                break;
 
             default:
                 Debug.LogError("뭔 직업이냐 이건.");
